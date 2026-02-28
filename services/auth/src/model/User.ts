@@ -15,7 +15,7 @@ const UserSchema: Schema<IUser> = new Schema(
     },
     email: {
       type: String,
-      unique: true,
+      unique: [true, "Account with the email already exists"],
       required: true,
     },
     image: {
@@ -29,7 +29,6 @@ const UserSchema: Schema<IUser> = new Schema(
   },
   { timestamps: true },
 );
-
 
 const User = mongoose.model<IUser>("User", UserSchema);
 

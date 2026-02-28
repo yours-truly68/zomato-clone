@@ -4,6 +4,8 @@ import jwt from "jsonwebtoken";
 import TryCatch from "../middleware/trycatch.middleware.js";
 import { AuthenticatedRequest } from "../middleware/isAuth.middleware.js";
 
+
+//Login user controller-->
 export const loginUser = TryCatch(async (req: Request, res: Response) => {
   const { name, email, picture } = req.body;
 

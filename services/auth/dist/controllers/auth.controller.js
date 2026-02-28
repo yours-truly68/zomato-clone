@@ -1,6 +1,7 @@
 import User from "../model/User.js";
 import jwt from "jsonwebtoken";
 import TryCatch from "../middleware/trycatch.middleware.js";
+//Login user controller-->
 export const loginUser = TryCatch(async (req, res) => {
     const { name, email, picture } = req.body;
     let user = await User.findOne({ email }); //checks if user exist - via email since its unique

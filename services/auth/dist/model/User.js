@@ -6,7 +6,7 @@ const UserSchema = new Schema({
     },
     email: {
         type: String,
-        unique: true,
+        unique: [true, "Account with the email already exists"],
         required: true,
     },
     image: {
