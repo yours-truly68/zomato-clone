@@ -3,11 +3,25 @@ import User from "../model/User.js";
 import jwt from "jsonwebtoken";
 import TryCatch from "../middleware/trycatch.middleware.js";
 import { AuthenticatedRequest } from "../middleware/isAuth.middleware.js";
-
+import { oauth2client } from "../config/google.config.js";
+import axios from "axios";
 
 //Login user controller-->
 export const loginUser = TryCatch(async (req: Request, res: Response) => {
-  const { name, email, picture } = req.body;
+  const { code } = req.body;
+
+  if (!code) {
+    return res.status(400).json({ message: "Authorization code is required" });
+  }
+
+  const googleResponse = await oauth2client.getToken(code);
+  oauth2client.setCredentials(googleResponse.tokens);
+
+  const userResponse = await axios.get(
+    `https://www.googleapis.com/oauth2/v1/userinfo?alt=json&access_token=${googleResponse.tokens.access_token}`,
+  );
+
+  const { name, email, picture } = userResponse.data;
 
   let user = await User.findOne({ email }); //checks if user exist - via email since its unique
 
