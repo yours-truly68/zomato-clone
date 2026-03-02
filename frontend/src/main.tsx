@@ -4,7 +4,7 @@ import "./index.css";
 import App from "./App.tsx";
 import { GoogleOAuthProvider } from "@react-oauth/google";
 
-export const authService = "http://localhost:5000";
+export const authService = "http://localhost:8000";
 
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
