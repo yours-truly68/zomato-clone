@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { authService } from "../main";
 import axios from "axios";
 import toast from "react-hot-toast";
+import { useGoogleLogin } from "@react-oauth/google";
 
 export const Login = () => {
   const [loading, setLoading] = useState<boolean>(false);
@@ -25,5 +26,18 @@ export const Login = () => {
       setLoading(false);
     }
   };
-  return <div>Login</div>;
+
+  const googleLogin = useGoogleLogin({
+    onSuccess: responseGoogle,
+    onError: responseGoogle,
+    flow: "auth-code",
+  });
+
+  return (
+    <div className="flex min-h-screen items-center justify-center bg-white px-4">
+      <div className="w-full max-w-sm space-y-6">
+        <h1 className="text-center text-3xl font-bold text-[#e23774]"></h1>
+      </div>
+    </div>
+  );
 };
