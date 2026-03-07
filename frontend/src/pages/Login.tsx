@@ -44,7 +44,7 @@ export const Login = () => {
           Login or Sign Up to Continue
         </p>
         <button
-          className="flex w-full items-center justify-center gap-3 rounded-xl border border-gray-300 bg-white px-4 py-4"
+          className="flex w-full items-center justify-center gap-3 rounded-xl border border-gray-200 bg-white px-4 py-4 transition hover:bg-gray-200"
           onClick={googleLogin}
           disabled={loading}
         >
