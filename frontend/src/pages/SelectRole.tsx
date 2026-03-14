@@ -15,7 +15,7 @@ export const SelectRole = () => {
 
   const addRole = async () => {
     try {
-      const { data } = await axios.post(
+      const { data } = await axios.put(
         `${authService}/api/auth/add/role`,
         { role },
         {
@@ -41,13 +41,21 @@ export const SelectRole = () => {
           {roles.map((r) => (
             <button
               key={r}
-              className="block w-full py-3 px-4 bg-[#e23744] text-white rounded-3xl hover:bg-[#cb2d3a] focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className={`w-full rounded-xl border px-4 py-3 text-sm font-medium capitalize transition ${role === r ? "border-[#e23744] bg-[#e23744] text-white" : "border-gray-300 bg-white text-gray-700 hover:bg-gray-100"}`}
               onClick={() => setRole(r)}
             >
               {r}
             </button>
           ))}
         </div>
+        <button
+          type="button"
+          disabled={!role}
+          className={`w-full rounded-xl border px-4 py-3 text-sm font-medium transition ${!role ? "cursor-not-allowed border-gray-300 bg-gray-300 text-gray-500" : "border-[#e23744] bg-[#e23744] text-white hover:bg-[#c92b3e]"}`}
+          onClick={addRole}
+        >
+          Continue
+        </button>
       </div>
     </div>
   );
