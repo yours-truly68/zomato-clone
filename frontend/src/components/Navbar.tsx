@@ -42,7 +42,7 @@ const Navbar = () => {
             </span>
           </Link>
           {isAuth ? (
-            <Link to="/account" className="font-medium text-[#e23744]">
+            <Link to={"/account"} className="font-medium text-[#e23744]">
               Profile
             </Link>
           ) : (
