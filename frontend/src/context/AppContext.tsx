@@ -7,7 +7,7 @@ import {
   type ReactNode,
 } from "react";
 import { authService } from "../main";
-import type { AppContextType, User } from "../types";
+import type { AppContextType, LocationData, User } from "../types";
 
 const AppContext = createContext<AppContextType | undefined>(undefined);
 
@@ -19,7 +19,7 @@ export const AppProvider = ({ children }: AppProviderProps) => {
   const [user, setUser] = useState<User | null>(null);
   const [isAuth, setIsAuth] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [location, setLocation] = useState(null);
+  const [location, setLocation] = useState<LocationData | null>(null);
   const [loadingLocation, setLoadingLocation] = useState(false);
   const [city, setCity] = useState("Fetching location...");
 
@@ -46,6 +46,40 @@ export const AppProvider = ({ children }: AppProviderProps) => {
     fetchUser();
   }, []);
 
+  useEffect(() => {
+    if (!navigator.geolocation)
+      return alert("Please allow location access to use the service");
+    setLoadingLocation(true);
+    navigator.geolocation.getCurrentPosition(async (position) => {
+      const { latitude, longitude } = position.coords;
+      try {
+        const response = await axios.get(
+          `https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}`,
+        );
+
+        setLocation({
+          latitude,
+          longitude,
+          formattedAddress: response.data.display_name || "current city",
+        });
+        setCity(
+          response.data.address.city ||
+            response.data.address.town ||
+            response.data.address.village ||
+            "Your Location",
+        );
+      } catch (error) {
+        setLocation({
+          latitude,
+          longitude,
+          formattedAddress: "current location",
+        });
+        setCity("Failed to load");
+        console.log(error);
+      }
+    });
+  }, []);
+
   return (
     <AppContext.Provider
       value={{
@@ -55,6 +89,9 @@ export const AppProvider = ({ children }: AppProviderProps) => {
         setLoading,
         setUser,
         setIsAuth,
+        location,
+        loadingLocation,
+        city,
       }}
     >
       {children}
