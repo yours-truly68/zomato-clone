@@ -2,6 +2,7 @@ import { Request, Response, NextFunction } from "express";
 import jwt, { JwtPayload } from "jsonwebtoken";
 
 interface IUser {
+  _id: string;
   name: string;
   email: string;
   role: string;
@@ -61,3 +62,18 @@ const isAuth = async (
 };
 
 export default isAuth;
+
+export const isSeller = (
+  req: AuthenticatedRequest,
+  res: Response,
+  next: NextFunction,
+) => {
+  const user = req.user;
+
+  if (user && user.role !== "seller") {
+    res.status(401).json({ message: "Only sellers can perform this action" });
+    return;
+  }
+
+  next();
+};

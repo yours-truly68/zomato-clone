@@ -35,3 +35,11 @@ const isAuth = async (req, res, next) => {
     }
 };
 export default isAuth;
+export const isSeller = (req, res, next) => {
+    const user = req.user;
+    if (user && user.role !== "seller") {
+        res.status(401).json({ message: "Only sellers can perform this action" });
+        return;
+    }
+    next();
+};
