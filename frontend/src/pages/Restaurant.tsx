@@ -46,7 +46,11 @@ const Restaurant = () => {
     return <AddRestaurant />;
   }
 
-  return <div>Restaurant</div>;
+  return (
+    <div className="flex min-h-screen items-center justify-center">
+      Restaurant
+    </div>
+  );
 };
 
 export default Restaurant;

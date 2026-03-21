@@ -25,7 +25,9 @@ export const addRestaurant = TryCatch(
       req.body;
 
     if (!name || !longitude || !latitude) {
-      return res.status(400).json({ message: "All fields are required" });
+      return res
+        .status(400)
+        .json({ message: "Name, longitude, and latitude are required" });
     }
 
     const file = req.file;
@@ -37,19 +39,23 @@ export const addRestaurant = TryCatch(
     if (!fileBuffer?.content) {
       return res.status(500).json({ message: "Failed to process image file" });
     }
+    let imageUrl = "";
 
-    const { data: uploadResult } = await axios.post(
-      `${process.env.UTILS_URL}/api/upload`,
-      {
-        buffer: fileBuffer?.content,
-      },
-    );
+    try {
+      const { data } = await axios.post(`${process.env.UTILS_URL}/api/upload`, {
+        buffer: fileBuffer.content,
+      });
+      imageUrl = data.url;
+    } catch (uploadError) {
+      console.error("Error uploading image: ", uploadError);
+      return res.status(500).json({ message: "Failed to upload image" });
+    }
 
     const restaurant = await Restaurant.create({
       name,
       description,
       phone,
-      image: uploadResult.url,
+      image: imageUrl,
       ownerId: user?._id,
       autoLocation: {
         type: "Point",
