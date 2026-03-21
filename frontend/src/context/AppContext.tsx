@@ -68,6 +68,7 @@ export const AppProvider = ({ children }: AppProviderProps) => {
             response.data.address.village ||
             "Your Location",
         );
+        setLoadingLocation(false);
       } catch (error) {
         setLocation({
           latitude,

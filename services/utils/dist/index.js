@@ -18,7 +18,7 @@ cloudinary.config({
     api_secret: CLOUD_API_SECRET,
 });
 app.use("/api", uploadRoutes);
-const PORT = process.env.PORT || 5002;
+const PORT = process.env.PORT || 8002;
 app.listen(PORT, () => {
     console.log(`Utils is listenting on port: ${PORT}`);
 });
