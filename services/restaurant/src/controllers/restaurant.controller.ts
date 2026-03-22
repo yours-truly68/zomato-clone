@@ -101,3 +101,62 @@ export const getRestaurant = TryCatch(
     res.status(200).json({ restaurant });
   },
 );
+
+export const updateRestaurantStatus = TryCatch(
+  async (req: AuthenticatedRequest, res) => {
+    if (!req.user) {
+      res.status(403).json({ message: "Unauthorized - Please Login" });
+      return;
+    }
+
+    const { status } = req.body;
+
+    if (typeof status !== "boolean") {
+      return res
+        .status(400)
+        .json({ message: "Status must be a boolean value" });
+    }
+
+    const restaurant = await Restaurant.findOneAndUpdate(
+      {
+        ownerId: req.user._id,
+      },
+      { isOpen: status },
+      { new: true },
+    );
+
+    if (!restaurant) {
+      return res.status(404).json({ message: "Restaurant not found" });
+    }
+
+    res
+      .status(200)
+      .json({ message: "Restaurant status updated successfully", restaurant });
+  },
+);
+
+export const updateRestaurantDetails = TryCatch(
+  async (req: AuthenticatedRequest, res) => {
+    if (!req.user) {
+      res.status(403).json({ message: "Unauthorized - Please Login" });
+      return;
+    }
+
+    const { name, description } = req.body;
+    const restaurant = await Restaurant.findOneAndUpdate(
+      {
+        ownerId: req.user._id,
+      },
+      { name: name, description: description },
+      { new: true },
+    );
+
+    if (!restaurant) {
+      return res.status(404).json({ message: "Restaurant not found" });
+    }
+
+    res
+      .status(200)
+      .json({ message: "Restaurant details updated successfully", restaurant });
+  },
+);

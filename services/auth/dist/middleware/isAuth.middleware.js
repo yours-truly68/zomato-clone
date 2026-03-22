@@ -31,7 +31,7 @@ export const isAuth = async (req, res, next) => {
     }
     catch (error) {
         res.status(500).json({
-            message: "Please Login - Jwt Error",
+            message: "JWT verification failed",
         });
     }
 };

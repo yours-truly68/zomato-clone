@@ -5,7 +5,11 @@ import axios from "axios";
 import { restaurantService } from "../main";
 import { BiMapPin, BiUpload } from "react-icons/bi";
 
-const AddRestaurant = () => {
+interface IAddRestaurantProps {
+  fetchMyRestaurant: () => Promise<void>;
+}
+
+const AddRestaurant = ({ fetchMyRestaurant }: IAddRestaurantProps) => {
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
   const [phone, setPhone] = useState("");
@@ -55,15 +59,13 @@ const AddRestaurant = () => {
     try {
       setSubmitting(true);
 
-      console.log("API URL:", `${restaurantService}/api/restaurant/new`);
-
       const response = await axios.post(
         `${restaurantService}/api/restaurant/new`,
         formData,
         {
           headers: {
             Authorization: `Bearer ${token}`,
-            "Content-Type": "multipart/form-data", // ✅ FORCE THIS
+            "Content-Type": "multipart/form-data",
           },
         },
       );
@@ -75,6 +77,7 @@ const AddRestaurant = () => {
       setDescription("");
       setPhone("");
       setImage(null);
+      await fetchMyRestaurant(); // ✅ Fetch updated restaurant list
     } catch (error: any) {
       console.log("Error:", error);
 
@@ -85,7 +88,7 @@ const AddRestaurant = () => {
         // Request made but no response
         toast.error("No response from server");
       } else {
-        // Something else
+        // Something else went wrong
         toast.error("Something went wrong");
       }
     } finally {
