@@ -4,6 +4,8 @@ import axios from "axios";
 import { restaurantService } from "../main";
 import AddRestaurant from "../components/AddRestaurant";
 import RestaurantProfile from "../components/RestaurantProfile";
+import MenuItems from "../components/MenuItems";
+import AddMenuItem from "../components/AddMenuItem";
 
 type SellerTab = "menu" | "add-item" | "sales";
 
@@ -63,8 +65,8 @@ const Restaurant = () => {
         <div className="flex border-b border-gray-300">
           {[
             { key: "menu", label: "Menu Items" },
-            { key: "sales", label: "Sales" },
             { key: "add-item", label: "Add Item" },
+            { key: "sales", label: "Sales" },
           ].map((tab) => (
             <button
               key={tab.key}
@@ -76,13 +78,15 @@ const Restaurant = () => {
           ))}
         </div>
         <div className="p-5">
-          {activeTab === "menu" && <p>Menu Page</p>}
-          {activeTab === "add-item" && <p>Add Item Page</p>}
+          {activeTab === "menu" && <MenuItems />}
+          {activeTab === "add-item" && (
+            <AddMenuItem onItemAdded={() => {}} />
+          )}
           {activeTab === "sales" && <p>Sales Page</p>}
         </div>
       </div>
     </div>
   );
 };
-
+ 
 export default Restaurant;

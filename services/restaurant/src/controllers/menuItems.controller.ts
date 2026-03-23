@@ -74,10 +74,7 @@ export const deleteMenuItem = TryCatch(
       return res.status(404).json({ message: "Menu item not found" });
     }
 
-    const restaurant = await Restaurant.findOne({
-      _id: menuItem.restaurantId,
-      ownerId: req.user?._id,
-    }).lean();
+    const restaurant = await Restaurant.findById(menuItem.restaurantId).lean();
 
     if (!restaurant) {
       return res.status(403).json({
@@ -106,9 +103,8 @@ export const toggleMenuItemAvailability = TryCatch(
       return res.status(404).json({ message: "Menu item not found" });
     }
 
-    const restaurant = await Restaurant.findOne({
+    const restaurant = await Restaurant.findById({
       _id: menuItem.restaurantId,
-      ownerId: req.user?._id,
     }).lean();
 
     if (!restaurant) {
