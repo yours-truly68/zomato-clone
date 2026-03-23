@@ -46,7 +46,59 @@ export const addMenuItem = TryCatch(async (req, res) => {
     res.status(201).json({ message: "Menu item added successfully", menuItem });
 });
 export const getMenuItems = TryCatch(async (req, res) => {
-    if (!req.user) {
-        return res.status(401).json({ message: "Unauthorized - Please Login" });
+    const { id } = req.params;
+    if (!id) {
+        return res.status(400).json({ message: "Restaurant ID is required" });
     }
+    const menuItems = await MenuItem.find({ restaurantId: id });
+    res.status(200).json(menuItems);
+});
+export const deleteMenuItem = TryCatch(async (req, res) => {
+    const { itemId } = req.params;
+    if (!itemId) {
+        return res.status(400).json({ message: "Menu item ID is required" });
+    }
+    const menuItem = await MenuItem.findById(itemId).lean();
+    if (!menuItem) {
+        return res.status(404).json({ message: "Menu item not found" });
+    }
+    const restaurant = await Restaurant.findOne({
+        _id: menuItem.restaurantId,
+        ownerId: req.user?._id,
+    }).lean();
+    if (!restaurant) {
+        return res.status(403).json({
+            message: "Forbidden - You do not have permission to delete this menu item",
+        });
+    }
+    await menuItem.deleteOne(); //deletes the item from the database
+    return res.status(200).json({
+        message: "Menu item deleted successfully",
+    });
+});
+export const toggleMenuItemAvailability = TryCatch(async (req, res) => {
+    const { itemId } = req.params;
+    if (!itemId) {
+        return res.status(400).json({ message: "Menu item ID is required" });
+    }
+    const menuItem = await MenuItem.findById(itemId).lean();
+    if (!menuItem) {
+        return res.status(404).json({ message: "Menu item not found" });
+    }
+    const restaurant = await Restaurant.findOne({
+        _id: menuItem.restaurantId,
+        ownerId: req.user?._id,
+    }).lean();
+    if (!restaurant) {
+        return res.status(403).json({
+            message: "Forbidden - You do not have permission to modify this menu item",
+        });
+    }
+    menuItem.isAvailable = !menuItem.isAvailable;
+    await menuItem.save();
+    await MenuItem.updateOne({ _id: itemId }, { isAvailable: menuItem.isAvailable });
+    return res.status(200).json({
+        message: "Menu item availability updated successfully",
+        menuItem,
+    });
 });

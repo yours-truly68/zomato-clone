@@ -7,7 +7,6 @@ export interface IRestaurant extends Document {
   ownerId: string;
   phone: number;
   isVerified: boolean;
-
   autoLocation: {
     type: "Point";
     coordinates: [number, number]; //[longitude, latitude],
