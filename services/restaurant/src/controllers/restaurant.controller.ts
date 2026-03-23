@@ -160,3 +160,67 @@ export const updateRestaurantDetails = TryCatch(
       .json({ message: "Restaurant details updated successfully", restaurant });
   },
 );
+
+export const getNearbyRestaurants = TryCatch(
+  async (req: AuthenticatedRequest, res) => {
+    const { latitude, longitude, radius = 5000, search = "" } = req.query;
+    if (!latitude || !longitude) {
+      return res
+        .status(400)
+        .json({ message: "Latitude and longitude are required" });
+    }
+
+    const radiusInMeters = Number(radius);
+    const query: any = {
+      isVerified: true,
+    };
+
+    if (search && typeof search === "string") {
+      query.name = { $regex: search, $options: "i" };
+    }
+
+    const restaurants = await Restaurant.aggregate([
+      {
+        $geoNear: {
+          near: {
+            type: "Point",
+            coordinates: [Number(longitude), Number(latitude)],
+          },
+          distanceField: "distance",
+          maxDistance: radiusInMeters,
+          spherical: true,
+          query,
+        },
+      },
+      { $sort: { isOpen: -1, distance: 1 } },
+      {
+        $addFields: {
+          distanceKm: {
+            $round: [{ $divide: ["$distance", 1000] }, 2],
+          },
+        },
+      },
+    ]);
+    res
+      .status(200)
+      .json({ success: true, count: restaurants.length, restaurants });
+  },
+);
+
+export const fetchSingleRestaurant = TryCatch(
+  async (req: AuthenticatedRequest, res) => {
+    const { id } = req.params;
+    if(!id){
+      return res.status(400).json({message: "Restaurant ID is required"});
+
+    }
+
+    const restaurant = await Restaurant.findById(id);
+
+    if(!restaurant){
+      return res.status(404).json({message: "Restaurant not found"});
+    }
+
+    res.status(200).json({success: true, restaurant});
+  },
+);

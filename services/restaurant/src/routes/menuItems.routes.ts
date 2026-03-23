@@ -7,12 +7,15 @@ import {
   toggleMenuItemAvailability,
 } from "../controllers/menuItems.controller.js";
 import upload from "../middlewares/multer.middleware.js";
+import { fetchSingleRestaurant, getNearbyRestaurants } from "../controllers/restaurant.controller.js";
 
 const router = epxress.Router();
 
 router.post("/new", isAuth, isSeller, upload, addMenuItem);
 router.get("/all/:id", isAuth, getMenuItems);
-router.delete("/delete/:id", isAuth, isSeller, deleteMenuItem);
-router.delete("/status/:id", isAuth, isSeller, toggleMenuItemAvailability);
+router.delete("/delete/:itemId", isAuth, isSeller, deleteMenuItem);
+router.put("/status/:itemId", isAuth, isSeller, toggleMenuItemAvailability);
+router.get("/all", isAuth, getNearbyRestaurants);
+router.get("/single/:id", isAuth, fetchSingleRestaurant);
 
 export default router;

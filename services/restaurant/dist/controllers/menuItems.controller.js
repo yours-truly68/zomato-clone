@@ -58,11 +58,11 @@ export const deleteMenuItem = TryCatch(async (req, res) => {
     if (!itemId) {
         return res.status(400).json({ message: "Menu item ID is required" });
     }
-    const menuItem = await MenuItem.findById(itemId).lean();
+    const menuItem = await MenuItem.findById(itemId);
     if (!menuItem) {
         return res.status(404).json({ message: "Menu item not found" });
     }
-    const restaurant = await Restaurant.findById(menuItem.restaurantId).lean();
+    const restaurant = await Restaurant.findById(menuItem.restaurantId);
     if (!restaurant) {
         return res.status(403).json({
             message: "Forbidden - You do not have permission to delete this menu item",
@@ -78,13 +78,13 @@ export const toggleMenuItemAvailability = TryCatch(async (req, res) => {
     if (!itemId) {
         return res.status(400).json({ message: "Menu item ID is required" });
     }
-    const menuItem = await MenuItem.findById(itemId).lean();
+    const menuItem = await MenuItem.findById(itemId);
     if (!menuItem) {
         return res.status(404).json({ message: "Menu item not found" });
     }
     const restaurant = await Restaurant.findById({
         _id: menuItem.restaurantId,
-    }).lean();
+    });
     if (!restaurant) {
         return res.status(403).json({
             message: "Forbidden - You do not have permission to modify this menu item",
@@ -92,9 +92,8 @@ export const toggleMenuItemAvailability = TryCatch(async (req, res) => {
     }
     menuItem.isAvailable = !menuItem.isAvailable;
     await menuItem.save();
-    await MenuItem.updateOne({ _id: itemId }, { isAvailable: menuItem.isAvailable });
     return res.status(200).json({
-        message: "Menu item availability updated successfully",
+        message: `Menu item is now ${menuItem.isAvailable ? "available" : "unavailable"}`,
         menuItem,
     });
 });

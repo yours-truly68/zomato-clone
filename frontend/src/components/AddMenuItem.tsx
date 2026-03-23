@@ -36,7 +36,7 @@ const AddMenuItem = ({ onItemAdded }: AddMenuItemProps) => {
     try {
       setLoading(true);
       const response = await axios.post(
-        `${restaurantService}/api/items/new`,
+        `${restaurantService}/api/item/new`,
         formData,
         {
           headers: {
