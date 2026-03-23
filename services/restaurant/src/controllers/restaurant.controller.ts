@@ -170,7 +170,14 @@ export const getNearbyRestaurants = TryCatch(
         .json({ message: "Latitude and longitude are required" });
     }
 
+    const latNum = Number(latitude);
+    const lonNum = Number(longitude);
+
+    if (isNaN(latNum) || isNaN(lonNum)) {
+      return res.status(400).json({ message: "Invalid coordinates" });
+    }
     const radiusInMeters = Number(radius);
+
     const query: any = {
       isVerified: true,
     };
@@ -184,10 +191,10 @@ export const getNearbyRestaurants = TryCatch(
         $geoNear: {
           near: {
             type: "Point",
-            coordinates: [Number(longitude), Number(latitude)],
+            coordinates: [lonNum, latNum],
           },
           distanceField: "distance",
-          maxDistance: radiusInMeters,
+          maxDistance: Number(radius),
           spherical: true,
           query,
         },
@@ -200,7 +207,9 @@ export const getNearbyRestaurants = TryCatch(
           },
         },
       },
+      { $limit: 20 },
     ]);
+
     res
       .status(200)
       .json({ success: true, count: restaurants.length, restaurants });
@@ -210,17 +219,16 @@ export const getNearbyRestaurants = TryCatch(
 export const fetchSingleRestaurant = TryCatch(
   async (req: AuthenticatedRequest, res) => {
     const { id } = req.params;
-    if(!id){
-      return res.status(400).json({message: "Restaurant ID is required"});
-
+    if (!id) {
+      return res.status(400).json({ message: "Restaurant ID is required" });
     }
 
     const restaurant = await Restaurant.findById(id);
 
-    if(!restaurant){
-      return res.status(404).json({message: "Restaurant not found"});
+    if (!restaurant) {
+      return res.status(404).json({ message: "Restaurant not found" });
     }
 
-    res.status(200).json({success: true, restaurant});
+    res.status(200).json({ success: true, restaurant });
   },
 );

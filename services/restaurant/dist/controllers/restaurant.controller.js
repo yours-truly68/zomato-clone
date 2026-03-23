@@ -119,6 +119,11 @@ export const getNearbyRestaurants = TryCatch(async (req, res) => {
             .status(400)
             .json({ message: "Latitude and longitude are required" });
     }
+    const latNum = Number(latitude);
+    const lonNum = Number(longitude);
+    if (isNaN(latNum) || isNaN(lonNum)) {
+        return res.status(400).json({ message: "Invalid coordinates" });
+    }
     const radiusInMeters = Number(radius);
     const query = {
         isVerified: true,
@@ -131,10 +136,10 @@ export const getNearbyRestaurants = TryCatch(async (req, res) => {
             $geoNear: {
                 near: {
                     type: "Point",
-                    coordinates: [Number(longitude), Number(latitude)],
+                    coordinates: [lonNum, latNum],
                 },
                 distanceField: "distance",
-                maxDistance: radiusInMeters,
+                maxDistance: Number(radius),
                 spherical: true,
                 query,
             },
@@ -147,6 +152,7 @@ export const getNearbyRestaurants = TryCatch(async (req, res) => {
                 },
             },
         },
+        { $limit: 20 },
     ]);
     res
         .status(200)
