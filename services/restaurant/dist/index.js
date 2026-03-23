@@ -10,7 +10,7 @@ app.use(cors());
 app.use(express.json());
 const PORT = process.env.PORT || 8001;
 app.use("/api/restaurant", restaurantRoutes);
-app.use("/api/items", itemRoutes);
+app.use("/api/item", itemRoutes);
 app.listen(PORT, () => {
     console.log(`Restaurant service is running on post ${PORT}`);
     connectDB();
