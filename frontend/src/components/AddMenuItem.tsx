@@ -45,7 +45,7 @@ const AddMenuItem = ({ onItemAdded }: AddMenuItemProps) => {
           },
         },
       );
-      toast.success("Menu item added successfully!");
+      toast.success(response.data.message || "Menu item added successfully!");
       resetForm();
       onItemAdded(); //Notify parent if needed to refresh menu items list
       setLoading(false);
