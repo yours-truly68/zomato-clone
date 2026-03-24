@@ -1,6 +1,6 @@
 import { useState } from "react";
 import type { IMenuItem } from "../pages/Restaurant";
-import { BsCart, BsEye } from "react-icons/bs";
+import { BsCartPlus, BsEye } from "react-icons/bs";
 import { FiEyeOff } from "react-icons/fi";
 import { BiTrash } from "react-icons/bi";
 import { VscLoading } from "react-icons/vsc";
@@ -110,7 +110,7 @@ const MenuItems = ({ isSeller, menuItems, onDeleteItems }: MenuItemsProps) => {
                     <div>
                       <button
                         onClick={() => toggleAvailibility(item._id)}
-                        className="rounded-lg p-2  text-gray-600 hover:underline hover:text-gray-400 text-sm"
+                        className="rounded-lg p-2  text-gray-600 hover:underline hover:text-gray-700 text-sm hover:bg-gray-100"
                       >
                         {item.isAvailable ? (
                           <BsEye size={18} />
@@ -122,7 +122,7 @@ const MenuItems = ({ isSeller, menuItems, onDeleteItems }: MenuItemsProps) => {
                         onClick={() => {
                           handleDelete(item._id);
                         }}
-                        className="rounded-lg p-2  text-red-600 hover:text-red-400 text-sm"
+                        className="rounded-lg p-2  text-red-600 hover:text-red-700 text-sm hover:bg-red-100 ml-2"
                       >
                         <BiTrash size={18} />
                       </button>
@@ -132,12 +132,16 @@ const MenuItems = ({ isSeller, menuItems, onDeleteItems }: MenuItemsProps) => {
                     <button
                       onClick={() => {}}
                       disabled={!item.isAvailable || isLoading}
-                      className={`flex items-center justify-center rounded-lg px-3 py-1 text-sm font-medium transition ${!item.isAvailable || isLoading ? "cursor-not-allowed text-gray-400" : "text-red-600 hover:text-red-400"}`}
+                      className={`flex items-center justify-center rounded-xl p-2 text-sm font-medium transition ${
+                        !item.isAvailable || isLoading
+                          ? "cursor-not-allowed text-gray-400"
+                          : "text-red-600 hover:text-red-700 hover:bg-red-100"
+                      }`}
                     >
                       {isLoading ? (
                         <VscLoading size={18} className="animate-spin" />
                       ) : (
-                        <BsCart size={18} />
+                        <BsCartPlus size={18} />
                       )}
                     </button>
                   )}
