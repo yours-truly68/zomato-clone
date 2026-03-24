@@ -1,1 +1,10 @@
 @import "tailwindcss";
+*,
+*::before,
+*::after {
+  font-family: "Poppins", sans-serif;
+}
+
+.button {
+  font: inherit;
+}

@@ -1,6 +1,6 @@
 import { useSearchParams } from "react-router-dom";
 import { useAppData } from "../context/AppContext";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import type { IRestaurant } from "../types";
 import axios from "axios";
 import { restaurantService } from "../main";
@@ -36,7 +36,7 @@ export const Home = () => {
     return +(R * c).toFixed(2); // Distance in km rounded to 2 decimal places
   };
 
-  const fetchRestaurants = async () => {
+  const fetchRestaurants = useCallback(async () => {
     if (!location?.latitude || !location?.longitude) {
       // alert(
       //   "Location not available. Please allow location access and try again.",
@@ -72,11 +72,11 @@ export const Home = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [location, searchQuery]);
 
   useEffect(() => {
     fetchRestaurants();
-  }, [location, searchQuery]);
+  }, [location, searchQuery, fetchRestaurants]);
 
   if (loading || !location) {
     return (
@@ -88,7 +88,7 @@ export const Home = () => {
   return (
     <div className="mx-auto max-w-7xl px-4 py-6 ">
       {restaurants.length > 0 ? (
-        <div className="grid grid-cols-4 sm:grid-cols-3 md:grid-cols-2 gap-4">
+        <div className="grid lg:grid-cols-4 sm:grid-cols-3 md:grid-cols-2 gap-4">
           {restaurants.map((restaurant) => {
             const [resLong, resLat] = restaurant.autoLocation.coordinates;
             const distance = getDistance(

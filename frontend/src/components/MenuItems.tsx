@@ -132,7 +132,7 @@ const MenuItems = ({ isSeller, menuItems, onDeleteItems }: MenuItemsProps) => {
                     <button
                       onClick={() => {}}
                       disabled={!item.isAvailable || isLoading}
-                      className={`flex items-center justify-center rounded-lg px-3 py-1 text-sm font-medium transition ${!item.isAvailable || isLoading ? "cursor-not-allowed text-gray-400" : "text-red-500 hover:text-red-50"}`}
+                      className={`flex items-center justify-center rounded-lg px-3 py-1 text-sm font-medium transition ${!item.isAvailable || isLoading ? "cursor-not-allowed text-gray-400" : "text-red-600 hover:text-red-400"}`}
                     >
                       {isLoading ? (
                         <VscLoading size={18} className="animate-spin" />
