@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import type { IRestaurant } from "../types";
+import type { IMenuItem, IRestaurant } from "../types";
 import axios from "axios";
 import { restaurantService } from "../main";
 import AddRestaurant from "../components/AddRestaurant";
@@ -8,17 +8,17 @@ import MenuItems from "../components/MenuItems";
 import AddMenuItem from "../components/AddMenuItem";
 
 type SellerTab = "menu" | "add-item" | "sales";
-export interface IMenuItem {
-  _id: string;
-  restaurantId: string;
-  name: string;
-  description: string;
-  price: number;
-  image?: string;
-  isAvailable: boolean;
-  createdAt: Date;
-  updatedAt: Date;
-}
+// export interface IMenuItem {
+//   _id: string;
+//   restaurantId: string;
+//   name: string;
+//   description: string;
+//   price: number;
+//   image?: string;
+//   isAvailable: boolean;
+//   createdAt: Date;
+//   updatedAt: Date;
+// }
 
 const Restaurant = () => {
   const [restaurant, setRestaurant] = useState<IRestaurant | null>(null);

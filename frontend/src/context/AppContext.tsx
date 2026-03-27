@@ -6,8 +6,8 @@ import {
   useState,
   type ReactNode,
 } from "react";
-import { authService } from "../main";
-import type { AppContextType, LocationData, User } from "../types";
+import { authService, restaurantService } from "../main";
+import type { AppContextType, ICart, LocationData, User } from "../types";
 import { Toaster } from "react-hot-toast";
 
 const AppContext = createContext<AppContextType | undefined>(undefined);
@@ -43,9 +43,41 @@ export const AppProvider = ({ children }: AppProviderProps) => {
     }
   }
 
+  const [cart, setCart] = useState<ICart[]>([]);
+  const [subTotal, setSubTotal] = useState(0);
+  const [quantity, setQuantity] = useState(0);
+
+  const fetchCart = async () => {
+    if (!user || user.role !== "customer") return;
+    const token = localStorage.getItem("token");
+    if (!token) {
+      console.log("No token found, user might not be authenticated");
+      return;
+    }
+    try {
+      const { data } = await axios.get(`${restaurantService}/api/cart/all`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      setCart(data.cart || []);
+      setSubTotal(data.subTotal || 0);
+      setQuantity(data.quantity || 0);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
   useEffect(() => {
     fetchUser();
   }, []);
+
+  useEffect(() => {
+    if (user && user.role === "customer") {
+      fetchCart();
+    }
+  }, [user]);
 
   useEffect(() => {
     if (!navigator.geolocation)
