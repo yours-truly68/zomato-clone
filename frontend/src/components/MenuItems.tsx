@@ -1,5 +1,4 @@
 import { useState } from "react";
-import type { IMenuItem } from "../pages/Restaurant";
 import { BsCartPlus, BsEye } from "react-icons/bs";
 import { FiEyeOff } from "react-icons/fi";
 import { BiTrash } from "react-icons/bi";
@@ -7,6 +6,8 @@ import { VscLoading } from "react-icons/vsc";
 import axios from "axios";
 import { restaurantService } from "../main";
 import toast from "react-hot-toast";
+import { useAppData } from "../context/AppContext";
+import type { IMenuItem } from "../types";
 
 interface MenuItemsProps {
   isSeller: boolean;
@@ -70,6 +71,40 @@ const MenuItems = ({ isSeller, menuItems, onDeleteItems }: MenuItemsProps) => {
       toast.error("Failed to update item availability");
     }
   };
+
+  const { fetchCart } = useAppData();
+
+  const addToCart = async (itemId: string, restaurantId: string) => {
+    try {
+      setLoadingItemId(itemId);
+      const token = localStorage.getItem("token");
+      if (!token) {
+        alert("You must be logged in to perform this action.");
+        return;
+      }
+
+      const { data } = await axios.post(
+        `${restaurantService}/api/cart/add-to-cart`,
+        {
+          restaurantId,
+          itemId,
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        },
+      );
+
+      toast.success(data.message);
+      fetchCart();
+    } catch (error: any) {
+      console.log("Error adding item to cart:", error);
+      toast.error(error.response.data.message || "Failed to add item to cart");
+    } finally {
+      setLoadingItemId(null);
+    }
+  };
   return (
     <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 ">
       {menuItems &&
@@ -130,7 +165,7 @@ const MenuItems = ({ isSeller, menuItems, onDeleteItems }: MenuItemsProps) => {
                   )}
                   {!isSeller && (
                     <button
-                      onClick={() => {}}
+                      onClick={() => addToCart(item._id, item.restaurantId)}
                       disabled={!item.isAvailable || isLoading}
                       className={`flex items-center justify-center rounded-xl p-2 text-sm font-medium transition ${
                         !item.isAvailable || isLoading

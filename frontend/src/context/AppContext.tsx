@@ -1,6 +1,7 @@
 import axios from "axios";
 import {
   createContext,
+  useCallback,
   useContext,
   useEffect,
   useState,
@@ -47,7 +48,7 @@ export const AppProvider = ({ children }: AppProviderProps) => {
   const [subTotal, setSubTotal] = useState(0);
   const [quantity, setQuantity] = useState(0);
 
-  const fetchCart = async () => {
+  const fetchCart = useCallback(async () => {
     if (!user || user.role !== "customer") return;
     const token = localStorage.getItem("token");
     if (!token) {
@@ -63,11 +64,11 @@ export const AppProvider = ({ children }: AppProviderProps) => {
 
       setCart(data.cart || []);
       setSubTotal(data.subTotal || 0);
-      setQuantity(data.quantity || 0);
+      setQuantity(data.cartLength || 0);
     } catch (error) {
       console.log(error);
     }
-  };
+  }, [user]);
 
   useEffect(() => {
     fetchUser();
@@ -126,6 +127,10 @@ export const AppProvider = ({ children }: AppProviderProps) => {
         location,
         loadingLocation,
         city,
+        cart,
+        subTotal,
+        quantity,
+        fetchCart,
       }}
     >
       {children}
