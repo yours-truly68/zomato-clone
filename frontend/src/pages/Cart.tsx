@@ -5,6 +5,8 @@ import type { ICart, IMenuItem, IRestaurant } from "../types";
 import axios from "axios";
 import { restaurantService } from "../main";
 import toast from "react-hot-toast";
+import { VscLoading } from "react-icons/vsc";
+import { BiMinus, BiPlus } from "react-icons/bi";
 
 const Cart = () => {
   const { cart, quantity, subTotal, fetchCart } = useAppData();
@@ -39,11 +41,15 @@ const Cart = () => {
     }
     try {
       setLoadingItemId(itemId);
-      const { data } = await axios.put(`${restaurantService}/api/cart/inc`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
+      const { data } = await axios.put(
+        `${restaurantService}/api/cart/inc`,
+        { itemId },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
         },
-      });
+      );
       await fetchCart();
       toast.success(data.message || "Quantity increased successfully");
     } catch (error) {
@@ -62,11 +68,15 @@ const Cart = () => {
     }
     try {
       setLoadingItemId(itemId);
-      await axios.put(`${restaurantService}/api/cart/dec`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
+      await axios.put(
+        `${restaurantService}/api/cart/dec`,
+        { itemId },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
         },
-      });
+      );
       await fetchCart();
       toast.success("Quantity decreased successfully");
     } catch (error) {
@@ -109,20 +119,56 @@ const Cart = () => {
       </div>
       <div className="space-y-4">
         {cart.map((cartItem: ICart) => {
-          const itemId = cartItem.itemId as IMenuItem;
-          const isLoading = loadingItemId === itemId._id;
+          const item = cartItem.itemId as IMenuItem;
+          const isLoading = loadingItemId === item._id;
 
           return (
             <div
-              key={itemId._id}
+              key={item._id}
               className="flex items-center gap-4 p-4 rounded-xl bg-white shadow-sm"
             >
               {/* Render cart item details */}
               <img
-                src={itemId.image}
-                alt={itemId.name}
+                src={item.image}
+                alt={item.name}
                 className="w-20 h-20 object-cover rounded-lg"
               />
+
+              <div className="flex-1">
+                <h3 className="text-lg font-semibold">{item.name}</h3>
+                <p className="text-gray-500 text-sm font-medium">
+                  ₹{item.price}
+                </p>
+              </div>
+
+              <div className="flex items-center gap-3">
+                <button
+                  className="rounded-full hover:border-gray-200 border-gray-600 p-2 hover:bg-gray-200 disabled:opacity-50 disabled:cursor-not-allowed"
+                  disabled={isLoading}
+                  onClick={() => decreaseQuantity(item._id)}
+                >
+                  {isLoading ? (
+                    <VscLoading size={18} className="animate-spin" />
+                  ) : (
+                    <BiMinus size={18} />
+                  )}
+                </button>
+                <span className="text-xl font-bold">{cartItem.quantity}</span>
+                <button
+                  className="rounded-full hover:border-gray-200 border-gray-600 p-2 hover:bg-gray-200 disabled:opacity-50 disabled:cursor-not-allowed"
+                  disabled={isLoading}
+                  onClick={() => increaseQuantity(item._id)}
+                >
+                  {isLoading ? (
+                    <VscLoading size={18} className="animate-spin" />
+                  ) : (
+                    <BiPlus size={18} />
+                  )}
+                </button>
+              </div>
+              <p className="text-2xl font-semibold w-20 text-right mr-2.5">
+                ₹{cartItem.quantity * item.price}
+              </p>
             </div>
           );
         })}

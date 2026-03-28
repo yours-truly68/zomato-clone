@@ -8,7 +8,6 @@ import { restaurantService } from "../main";
 import toast from "react-hot-toast";
 import { useAppData } from "../context/AppContext";
 import type { IMenuItem } from "../types";
-
 interface MenuItemsProps {
   isSeller: boolean;
   menuItems: IMenuItem[];
@@ -123,21 +122,21 @@ const MenuItems = ({ isSeller, menuItems, onDeleteItems }: MenuItemsProps) => {
                   className={`h-20 w-20 rounded object-cover ${!item.isAvailable ? "grayscale brightness-75" : ""}`}
                 />
                 {!item.isAvailable && (
-                  <span className="absolute inset-0 flex items-center justify-center bg-black/60 text-xs font-semibold text-white ">
+                  <span className="absolute inset-0 flex items-center justify-center bg-black/60 text-xs font-semibold text-white text-center rounded-lg">
                     Not Available
                   </span>
                 )}
               </div>
               <div className="flex flex-1 flex-col justify-between ">
                 <div>
-                  <h3 className="text-sm font-semibold">{item.name}</h3>
+                  <h3 className="font-semibold">{item.name}</h3>
                   {item.description && (
                     <p className="mt-1 text-sm text-gray-500 line-clamp-2">
                       {item.description}
                     </p>
                   )}
                 </div>
-                <div className="mt-1 flex items-center justify-between gap-4">
+                <div className="mt-2 flex items-center justify-between gap-4">
                   <p className="text-lg font-medium">
                     ₹{item.price.toFixed(2)}
                   </p>

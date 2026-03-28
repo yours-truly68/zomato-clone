@@ -96,8 +96,8 @@ const RestaurantPage = () => {
       />
 
       <div className="rounded-xl bg-white shadow-sm px-3 py-4">
-        <h3 className="text-2xl font-medium text-gray-600 mb-4 text-center ">
-          Menu
+        <h3 className="text-xl font-medium text-gray-600 mb-4 text-left ">
+          Menu Items
         </h3>
         <MenuItems
           isSeller={false}
