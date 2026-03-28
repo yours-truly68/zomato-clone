@@ -3,7 +3,7 @@ import type { IRestaurant } from "../types";
 import axios from "axios";
 import { restaurantService } from "../main";
 import toast from "react-hot-toast";
-import { BiEdit, BiMapPin, BiSave } from "react-icons/bi";
+import { BiEdit, BiImage, BiMapPin, BiSave } from "react-icons/bi";
 
 interface IRestaurantProfileProps {
   restaurant: IRestaurant;
@@ -21,6 +21,7 @@ const RestaurantProfile = ({
   const [description, setDescription] = useState(restaurant.description);
   const [loading, setLoading] = useState(false);
   const [isOpen, setIsOpen] = useState(restaurant.isOpen);
+  const [imageFile, setImageFile] = useState<File | null>(null);
 
   const toggleOpenStatus = async () => {
     if (!isSeller || !restaurant._id) return; // Only sellers can toggle status
@@ -52,13 +53,21 @@ const RestaurantProfile = ({
   const saveChanges = async () => {
     try {
       setLoading(true);
+
       const token = localStorage.getItem("token");
-      if (!token) {
-        throw new Error("Authentication token not found");
+      if (!token) throw new Error("Authentication token not found");
+
+      const formData = new FormData();
+      formData.append("name", name || "");
+      formData.append("description", description || "");
+
+      if (imageFile) {
+        formData.append("image", imageFile);
       }
+
       const { data } = await axios.put(
         `${restaurantService}/api/restaurant/edit`,
-        { name, description },
+        formData,
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -68,11 +77,13 @@ const RestaurantProfile = ({
 
       toast.success(data.message);
       onUpdate(data.restaurant);
+
       setEditMode(false);
+      setImageFile(null); // ✅ reset
     } catch (error: any) {
       console.log(error);
       toast.error(
-        error.response.data.message || "Failed to update restaurant details",
+        error.response?.data?.message || "Failed to update restaurant details",
       );
     } finally {
       setLoading(false);
@@ -80,13 +91,29 @@ const RestaurantProfile = ({
   };
 
   return (
-    <div className="mx-auto max-w-xl bg-white shadow-sm rounded-xl overflow-hidden">
+    <div className="relative mx-auto max-w-xl bg-white shadow-sm rounded-xl overflow-hidden">
       {restaurant.image && (
         <img
-          src={restaurant.image}
+          src={imageFile ? URL.createObjectURL(imageFile) : restaurant.image}
           alt={restaurant.name}
-          className="w-full h-full object-cover"
+          className="w-full h-64 object-cover"
         />
+      )}
+      {isSeller && editMode && (
+        <label className="cursor-pointer text-sm text-white p-2 bg-gray-500 rounded-lg absolute top-4 right-4 flex items-center gap-1 hover:bg-gray-700 transition-colors">
+          <BiImage size={16} className="inline-block mr-1" />
+          Change Image
+          <input
+            type="file"
+            accept="image/*"
+            hidden
+            onChange={(e) => {
+              if (e.target.files && e.target.files[0]) {
+                setImageFile(e.target.files[0]);
+              }
+            }}
+          />
+        </label>
       )}
       <div className="p-5 space-y-4">
         <div className="flex items-start justify-between">

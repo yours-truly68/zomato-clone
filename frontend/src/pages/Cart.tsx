@@ -17,7 +17,7 @@ const Cart = () => {
 
   if (!cart || cart.length === 0) {
     return (
-      <div className="flex justify-center items-center min-h-[calc(100vh - 64px)]">
+      <div className="min-h-[calc(100vh - 64px)] flex justify-center items-center">
         <p className="text-gray-500 text-lg font-semibold mt-4">
           Your cart is empty
         </p>
@@ -119,6 +119,7 @@ const Cart = () => {
       </div>
       <div className="space-y-4">
         {cart.map((cartItem: ICart) => {
+          if (!cartItem.itemId) return null; // ✅ guard
           const item = cartItem.itemId as IMenuItem;
           const isLoading = loadingItemId === item._id;
 
@@ -220,10 +221,11 @@ const Cart = () => {
             )}
           </button>
           <button
-            className="text-white mt-3 py-3 text-sm bg-[#e23744] hover:bg-red-700 w-full font-semibold rounded-lg transition-colors disabled:cursor-not-allowed disabled:bg-gray-400"
+            className={`text-white mt-3 py-3 text-sm bg-[#e23744] hover:bg-red-700 w-full font-semibold rounded-lg transition-colors disabled:cursor-not-allowed disabled:bg-gray-400 ${!restaurant.isOpen ? "opacity-50 cursor-not-allowed" : ""}`}
+            disabled={!restaurant.isOpen}
             onClick={checkout}
           >
-            Proceed to Checkout
+            {restaurant.isOpen ? "Proceed to Checkout" : "Restaurant Closed"}
           </button>
         </div>
       </div>

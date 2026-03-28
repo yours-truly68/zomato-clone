@@ -6,7 +6,7 @@ const router = Router();
 router.post("/new", isAuth, isSeller, upload, addRestaurant);
 router.get("/my", isAuth, isSeller, getRestaurant);
 router.put("/status", isAuth, isSeller, updateRestaurantStatus);
-router.put("/edit", isAuth, isSeller, updateRestaurantDetails);
+router.put("/edit", isAuth, isSeller, upload, updateRestaurantDetails);
 router.get("/all", isAuth, getNearbyRestaurants);
 router.get("/single/:id", isAuth, fetchSingleRestaurant);
 export default router;

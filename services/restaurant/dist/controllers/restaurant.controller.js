@@ -98,19 +98,32 @@ export const updateRestaurantStatus = TryCatch(async (req, res) => {
 });
 export const updateRestaurantDetails = TryCatch(async (req, res) => {
     if (!req.user) {
-        res.status(403).json({ message: "Unauthorized - Please Login" });
-        return;
+        return res.status(403).json({ message: "Unauthorized - Please Login" });
     }
     const { name, description } = req.body;
-    const restaurant = await Restaurant.findOneAndUpdate({
+    // Get existing restaurant
+    const restaurant = await Restaurant.findOne({
         ownerId: req.user._id,
-    }, { name: name, description: description }, { new: true });
+    });
     if (!restaurant) {
         return res.status(404).json({ message: "Restaurant not found" });
     }
-    res
-        .status(200)
-        .json({ message: "Restaurant details updated successfully", restaurant });
+    let imageUrl = restaurant.image;
+    // ✅ Handle image upload
+    if (req.file) {
+        console.log("Image received:", req.file.originalname);
+        // TEMP (testing only)
+        imageUrl = `data:${req.file.mimetype};base64,${req.file.buffer.toString("base64")}`;
+    }
+    // ✅ Update fields
+    restaurant.name = name || restaurant.name;
+    restaurant.description = description || restaurant.description;
+    restaurant.image = imageUrl;
+    await restaurant.save();
+    res.status(200).json({
+        message: "Restaurant details updated successfully",
+        restaurant,
+    });
 });
 export const getNearbyRestaurants = TryCatch(async (req, res) => {
     const { latitude, longitude, radius = 5000, search = "" } = req.query;

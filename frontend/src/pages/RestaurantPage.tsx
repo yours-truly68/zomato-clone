@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
-import type { IRestaurant } from "../types";
-import type { IMenuItem } from "./Restaurant";
+import type { IMenuItem, IRestaurant } from "../types";
+
 import { restaurantService } from "../main";
 import axios from "axios";
 import toast from "react-hot-toast";
