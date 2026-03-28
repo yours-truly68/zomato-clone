@@ -17,7 +17,7 @@ const Account = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 px-4 py-6">
+    <div className="min-h-[calc(100vh-64px)] bg-gray-50 px-4 py-6">
       <div className="mx-auto max-w-md rounded-3xl bg-white shadow-sm">
         <div className="flex items-center gap-4 border-b border-b-gray-200 p-5">
           <div className="flex h-14 w-14 items-center justify-center rounded-full bg-red-500 text-xl font-semibold text-white">

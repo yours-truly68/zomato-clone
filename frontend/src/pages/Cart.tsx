@@ -18,7 +18,7 @@ const Cart = () => {
   if (!cart || cart.length === 0) {
     return (
       <div className="flex justify-center items-center min-h-[calc(100vh - 64px)]">
-        <p className="text-gray-500 text-lg font-semibold">
+        <p className="text-gray-500 text-lg font-semibold mt-4">
           Your cart is empty
         </p>
       </div>
@@ -29,7 +29,7 @@ const Cart = () => {
 
   const deliveryCharges = subTotal < 250 ? 49 : 0;
 
-  const platformCharges = subTotal * 0.05;
+  const platformCharges = 7 + 0.025 * subTotal;
 
   const grandTotal = subTotal + deliveryCharges + platformCharges;
 
@@ -172,6 +172,60 @@ const Cart = () => {
             </div>
           );
         })}
+      </div>
+      <div className="rounded-xl p-4 space-y-3 bg-white shadow-sm ">
+        <div className="flex justify-between text-sm">
+          <span>Total Items</span>
+          <span>{quantity}</span>
+        </div>
+        <div className="flex justify-between text-sm">
+          <span>Subtotal</span>
+          <span>₹{subTotal.toFixed(2)}</span>
+        </div>
+        <div className="flex justify-between text-sm">
+          <span>Delivery Charges</span>
+          <span
+            className={
+              deliveryCharges === 0 ? "text-gray-500 font-semibold" : ""
+            }
+          >
+            {deliveryCharges === 0 ? "Free" : `₹${deliveryCharges.toFixed(2)}`}
+          </span>
+        </div>
+        <div className="flex justify-between text-sm">
+          <span>Platform Fee</span>
+          <span>₹{platformCharges.toFixed(2)} </span>
+        </div>
+        {subTotal < 250 && (
+          <p className="text-xs text-red-500 text-center p-2 bg-red-100 rounded-lg">
+            Add items worth ₹{250 - subTotal} more to get Free delivery
+          </p>
+        )}
+        <div className="flex justify-between text-sm border-t pt-3 font-semibold border-gray-200">
+          <span className="text-xl font-semibold">Grand Total</span>
+          <span className="text-2xl font-semibold">
+            ₹{grandTotal.toFixed(2)}
+          </span>
+        </div>
+        <div className="flex justify-between gap-3 sm:flex-row flex-col">
+          <button
+            className="text-white mt-3 py-3 text-sm bg-gray-500 hover:bg-gray-700 w-full font-semibold rounded-lg transition-colors disabled:cursor-not-allowed disabled:bg-gray-400"
+            onClick={clearCart}
+            disabled={clearingCart}
+          >
+            {clearingCart ? (
+              <VscLoading size={18} className="animate-spin mx-auto" />
+            ) : (
+              "Clear Cart"
+            )}
+          </button>
+          <button
+            className="text-white mt-3 py-3 text-sm bg-[#e23744] hover:bg-red-700 w-full font-semibold rounded-lg transition-colors disabled:cursor-not-allowed disabled:bg-gray-400"
+            onClick={checkout}
+          >
+            Proceed to Checkout
+          </button>
+        </div>
       </div>
     </div>
   );

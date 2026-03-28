@@ -5,8 +5,8 @@
   font-family: "Poppins", "Satoshi", sans-serif;
 }
 
-.button {
-  font: inherit;
+button {
+  font-family: "Poppins", "Satoshi", sans-serif;
 }
 
 /* Ensure your font is imported, e.g., from Google Fonts */
