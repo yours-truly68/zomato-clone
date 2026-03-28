@@ -29,7 +29,7 @@ const Cart = () => {
 
   const deliveryCharges = subTotal < 250 ? 49 : 0;
 
-  const platformCharges = 7 + 0.025 * subTotal;
+  const platformCharges = subTotal < 500 ? 7 : 0 + 0.015 * subTotal;
 
   const grandTotal = subTotal + deliveryCharges + platformCharges;
 
@@ -166,7 +166,7 @@ const Cart = () => {
                   )}
                 </button>
               </div>
-              <p className="text-2xl font-semibold w-20 text-right mr-2.5">
+              <p className="text-xl font-semibold w-20 text-right mr-2.5">
                 ₹{cartItem.quantity * item.price}
               </p>
             </div>
