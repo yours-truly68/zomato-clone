@@ -4,7 +4,7 @@ import jwt from "jsonwebtoken";
 import TryCatch from "../middlewares/TryCatch.middleware.js";
 import Restaurant from "../models/Restaurant.model.js";
 export const addRestaurant = TryCatch(async (req, res) => {
-    console.log("REQ.FILE:", req.file);
+    // console.log("REQ.FILE:", req.file);
     const user = req.user;
     if (!user) {
         return res.status(401).json({ message: "Unauthorized" });
@@ -152,7 +152,7 @@ export const getNearbyRestaurants = TryCatch(async (req, res) => {
                     coordinates: [lonNum, latNum],
                 },
                 distanceField: "distance",
-                maxDistance: Number(radius),
+                maxDistance: radiusInMeters,
                 spherical: true,
                 query,
             },

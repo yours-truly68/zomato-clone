@@ -7,7 +7,7 @@ import Restaurant from "../models/Restaurant.model.js";
 
 export const addRestaurant = TryCatch(
   async (req: AuthenticatedRequest, res) => {
-    console.log("REQ.FILE:", req.file);
+    // console.log("REQ.FILE:", req.file);
     const user = req.user;
 
     if (!user) {
@@ -209,7 +209,7 @@ export const getNearbyRestaurants = TryCatch(
             coordinates: [lonNum, latNum],
           },
           distanceField: "distance",
-          maxDistance: Number(radius),
+          maxDistance: radiusInMeters,
           spherical: true,
           query,
         },
