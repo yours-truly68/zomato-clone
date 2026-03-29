@@ -239,7 +239,7 @@ bg-[#E23744] px-4 py-3 text-white hover:bg-[#d32f3a] disabled:opacity-50"
               <div>
                 <p className="text-sm font-medium">{addr.formattedAddress}</p>
 
-                <p className="text-sm text-gray-500">
+                <p className="text-sm text-gray-400">
                   <span className="mr-1">📞</span> {addr.phone}
                 </p>
               </div>
