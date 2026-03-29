@@ -11,6 +11,7 @@ import Restaurant from "./pages/Restaurant";
 import RestaurantPage from "./pages/RestaurantPage";
 import Cart from "./pages/Cart";
 import Address from "./pages/Address";
+import Checkout from "./pages/Checkout";
 
 const App = () => {
   const { user } = useAppData();
@@ -34,6 +35,7 @@ const App = () => {
             <Route path={"/select-role"} element={<SelectRole />} />
             <Route path={"/account"} element={<Account />} />
             <Route path={"/address"} element={<Address />} />
+            <Route path={"/checkout"} element={<Checkout />} />
           </Route>
         </Routes>
       </BrowserRouter>
