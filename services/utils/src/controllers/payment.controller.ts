@@ -1,6 +1,8 @@
 import axios from "axios";
 import { Request, Response } from "express";
 import razorpayInstance from "../config/razorpay.config.js";
+import { verifyRazorpaySignature } from "../config/verifyRazorpay.config.js";
+import { publichPaymentSuccess } from "../config/payment.producer.js";
 
 export const createRazorpayOrder = async (req: Request, res: Response) => {
   const { orderId } = req.body;
@@ -24,4 +26,32 @@ export const createRazorpayOrder = async (req: Request, res: Response) => {
     razorpayOrderId: razorpayOrder.id,
     key: process.env.RAZOR_PAY_KEY_SECRET!,
   });
+};
+
+export const verifyRazorpayPayment = async (req: Request, res: Response) => {
+  const {
+    razorpay_order_id,
+    razorpay_payment_id,
+    razorpay_signature,
+    orderId,
+  } = req.body;
+
+  const isValid = verifyRazorpaySignature(
+    razorpay_order_id,
+    razorpay_payment_id,
+    razorpay_signature,
+  );
+
+  if (!isValid) {
+    return res.status(400).json({ message: "Invalid payment signature" });
+  }
+
+  // Update order status in the restaurant service
+  await publichPaymentSuccess({
+    orderId,
+    paymentId: razorpay_payment_id,
+    provider: "razorpay",
+  });
+
+  res.json({ message: "Payment verified successfully" });
 };
