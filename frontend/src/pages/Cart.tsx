@@ -29,7 +29,7 @@ const Cart = () => {
 
   const deliveryCharges = subTotal < 250 ? 49 : 0;
 
-  const platformCharges = subTotal < 500 ? 7 : 0 + 0.015 * subTotal;
+  const platformCharges = subTotal < 500 ? 7 : Math.ceil(0 + 0.015 * subTotal);
 
   const grandTotal = subTotal + deliveryCharges + platformCharges;
 

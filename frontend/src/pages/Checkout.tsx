@@ -17,7 +17,8 @@ const Checkout = () => {
   const [selectAddressId, setSelectAddressId] = useState<string | null>(null);
   const [loadingAddress, setLoadingAddress] = useState(true);
   const [loadingRazorpay, setLoadingRazorpay] = useState(false);
-  const [createOrder, setCreateOrder] = useState(false);
+  const [creatingOrder, setCreatingOrder] = useState(false);
+  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchAddress = async () => {
@@ -53,9 +54,21 @@ const Checkout = () => {
     );
   }
 
-  const navigate = useNavigate();
-
   const restaurant = cart[0].restaurantId as IRestaurant;
+
+  const deliveryCharges = subTotal < 250 ? 49 : 0;
+
+  const platformCharges = subTotal < 500 ? 7 : Math.ceil(0 + 0.015 * subTotal);
+
+  const grandTotal = subTotal + deliveryCharges + platformCharges;
+
+  const createOrder = async (paymentMethod: "razorpay" | "stripe") => {
+    if (!selectAddressId) return null;
+    setCreatingOrder(true);
+    try {
+      const { data } = await axios.post(`{}`);
+    } catch (error) {}
+  };
 
   return (
     <div className="flex items-center justify-center h-[calc(100vh-64px)] text-5xl font-semibold text-gray-500">
