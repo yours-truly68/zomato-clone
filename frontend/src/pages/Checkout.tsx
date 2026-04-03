@@ -5,7 +5,6 @@ import { restaurantService, utilServices } from "../main";
 import { useNavigate } from "react-router-dom";
 import type { ICart, IMenuItem, IRestaurant } from "../types";
 import toast from "react-hot-toast";
-import { VscLoading } from "react-icons/vsc";
 import { BiCreditCard, BiLoader } from "react-icons/bi";
 
 interface Address {
@@ -15,7 +14,7 @@ interface Address {
 }
 
 const Checkout = () => {
-  const { cart, subTotal, quantity } = useAppData();
+  const { cart, subTotal, quantity, fetchCart } = useAppData();
   const [address, setAddress] = useState<Address[]>([]);
   const [selectAddressId, setSelectAddressId] = useState<string | null>(null);
   const [loadingAddress, setLoadingAddress] = useState(true);
@@ -140,13 +139,14 @@ const Checkout = () => {
           try {
             await axios.post(`${utilServices}/api/payment/verify`, {
               orderId,
-              razor_payment_id: response.razorpay_payment_id,
-              razor_order_id: response.razorpay_order_id,
+              razorpay_payment_id: response.razorpay_payment_id,
+              razorpay_order_id: response.razorpay_order_id,
               razorpay_signature: response.razorpay_signature,
             });
 
             toast.success("Payment successful!");
-            navigate("/paymentsuccess" + response.razorpay_payment_id);
+            fetchCart();
+            navigate(`/paymentsuccess/${response.razorpay_payment_id}`);
           } catch (error) {
             console.error("Error verifying payment:", error);
             toast.error("Payment verification failed. Please contact support.");
