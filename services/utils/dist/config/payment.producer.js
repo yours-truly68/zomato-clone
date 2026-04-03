@@ -5,5 +5,5 @@ export const publichPaymentSuccess = async (payload) => {
         console.error("🐇 RabbitMQ channel is not available");
         return;
     }
-    channel.sendToQueue(process.env.PAYMENT_SUCCESS_QUEUE, Buffer.from(JSON.stringify({ type: "PAYMENT_SUCCESS", data: payload })), { persistent: true });
+    channel.sendToQueue(process.env.PAYMENT_QUEUE, Buffer.from(JSON.stringify({ type: "PAYMENT_SUCCESS", data: payload })), { persistent: true });
 };

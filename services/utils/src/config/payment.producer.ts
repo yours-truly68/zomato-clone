@@ -11,7 +11,7 @@ export const publichPaymentSuccess = async (payload: {
     return;
   }
   channel.sendToQueue(
-    process.env.PAYMENT_SUCCESS_QUEUE!,
+    process.env.PAYMENT_QUEUE!,
     Buffer.from(JSON.stringify({ type: "PAYMENT_SUCCESS", data: payload })),
     { persistent: true },
   );
