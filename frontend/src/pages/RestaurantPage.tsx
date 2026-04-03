@@ -12,7 +12,8 @@ const RestaurantPage = () => {
   const { id } = useParams();
   const [restaurant, setRestaurant] = useState<IRestaurant | null>(null);
   const [menuItems, setMenuItems] = useState<IMenuItem[]>([]);
-  const [loading, setLoading] = useState(false);
+  const [loadingMenu, setLoadingMenu] = useState(false);
+  const [loadingRestaurant, setLoadingRestaurant] = useState(false);
 
   const fetchRestaurantDetails = useCallback(async () => {
     const token = localStorage.getItem("token");
@@ -20,7 +21,7 @@ const RestaurantPage = () => {
       toast.error("Please login to view restaurant details");
       return;
     }
-    setLoading(true);
+    setLoadingRestaurant(true);
     try {
       const { data } = await axios.get(
         `${restaurantService}/api/restaurant/single/${id}`,
@@ -35,7 +36,7 @@ const RestaurantPage = () => {
     } catch (error) {
       console.log("Error fetching restaurant details:", error);
     } finally {
-      setLoading(false);
+      setLoadingRestaurant(false);
     }
   }, [id]);
 
@@ -46,7 +47,7 @@ const RestaurantPage = () => {
       return;
     }
 
-    setLoading(true);
+    setLoadingMenu(true);
     try {
       const { data } = await axios.get(
         `${restaurantService}/api/item/all/${id}`,
@@ -61,7 +62,7 @@ const RestaurantPage = () => {
     } catch (error) {
       console.log("Error fetching menu items:", error);
     } finally {
-      setLoading(false);
+      setLoadingMenu(false);
     }
   }, [id]);
 
@@ -72,7 +73,15 @@ const RestaurantPage = () => {
     }
   }, [id, fetchMenuItems, fetchRestaurantDetails]);
 
-  if (loading) {
+  if (loadingRestaurant || loadingMenu) {
+    return (
+      <div className="flex items-center justify-center h-[60vh]">
+        <p className="text-gray-500">Fetching restaurant details...</p>
+      </div>
+    );
+  }
+
+  if (loadingRestaurant) {
     return (
       <div className="flex items-center justify-center h-[60vh]">
         <p className="text-gray-500">Fetching restaurant details...</p>
@@ -84,6 +93,13 @@ const RestaurantPage = () => {
     return (
       <div className="flex items-center justify-center h-[60vh]">
         <p className="text-gray-500">Restaurant not found.</p>
+      </div>
+    );
+  }
+  if (loadingMenu) {
+    return (
+      <div className="flex items-center justify-center h-[60vh]">
+        <p className="text-gray-500">Fetching menu items...</p>
       </div>
     );
   }

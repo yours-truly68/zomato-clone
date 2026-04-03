@@ -29,7 +29,7 @@ const Cart = () => {
 
   const deliveryCharges = subTotal < 250 ? 49 : 0;
 
-  const platformCharges = subTotal < 500 ? 7 : Math.ceil(0 + 0.015 * subTotal);
+  const platformCharges = subTotal < 500 ? 7 : Math.ceil(0.015 * subTotal);
 
   const grandTotal = subTotal + deliveryCharges + platformCharges;
 
@@ -190,7 +190,13 @@ const Cart = () => {
               deliveryCharges === 0 ? "text-gray-500 font-semibold" : ""
             }
           >
-            {deliveryCharges === 0 ? "Free" : `₹${deliveryCharges.toFixed(2)}`}
+            {deliveryCharges === 0 ? (
+              <span className="font-bold text-green-500 px-3 py-1 rounded-md bg-green-100 ">
+                Free
+              </span>
+            ) : (
+              `₹${deliveryCharges.toFixed(2)}`
+            )}
           </span>
         </div>
         <div className="flex justify-between text-sm">

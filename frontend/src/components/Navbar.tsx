@@ -32,7 +32,7 @@ const Navbar = () => {
           to="/"
           className="text-2xl font-bold text-[#e23744] cursor-pointer"
         >
-          Zomato-Clone
+          Zomatoes
         </Link>
         <div className="flex items-center gap-4">
           <Link to="/cart" className="relative ">
