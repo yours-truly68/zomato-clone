@@ -8,7 +8,6 @@ import {
 const router = Router();
 
 router.post("/new", isAuth, createOrder);
-router.get("/payment/:id", isAuth, fetchOrderForPayment);
-
+router.get("/payment/:id", fetchOrderForPayment);
 
 export default router;

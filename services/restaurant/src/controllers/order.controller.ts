@@ -5,6 +5,7 @@ import Cart from "../models/Cart.model.js";
 import { IMenuItem } from "../models/MenuItems.model.js";
 import Order from "../models/Orders.model.js";
 import Restaurant, { IRestaurant } from "../models/Restaurant.model.js";
+import jwt from "jsonwebtoken";
 
 export const createOrder = TryCatch(async (req: AuthenticatedRequest, res) => {
   const user = req.user;
@@ -13,7 +14,8 @@ export const createOrder = TryCatch(async (req: AuthenticatedRequest, res) => {
   }
 
   // Logic to create order goes here
-  const { paymentMethod, addressId, distance } = req.body;
+  const { paymentMethod, addressId } = req.body;
+
   if (!addressId) {
     return res.status(400).json({ message: "Address is required" });
   }
@@ -22,6 +24,27 @@ export const createOrder = TryCatch(async (req: AuthenticatedRequest, res) => {
   if (!address) {
     return res.status(404).json({ message: "Address not found" });
   }
+
+  const getDistance = (
+    lat1: number,
+    lon1: number,
+    lat2: number,
+    lon2: number,
+  ): number => {
+    //haversine formula to calculate distance between two lat/lon points in km
+    const toRad = (value: number) => (value * Math.PI) / 180;
+    const R = 6371; // Earth radius in km
+    const dLat = toRad(lat2 - lat1);
+    const dLon = toRad(lon2 - lon1);
+    const a =
+      Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+      Math.cos(toRad(lat1)) *
+        Math.cos(toRad(lat2)) *
+        Math.sin(dLon / 2) *
+        Math.sin(dLon / 2);
+    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+    return +(R * c).toFixed(2); // Distance in km rounded to 2 decimal places
+  };
 
   const cartItems = await Cart.find({ userId: user._id })
     .populate<{ itemId: IMenuItem }>("itemId")
@@ -50,6 +73,13 @@ export const createOrder = TryCatch(async (req: AuthenticatedRequest, res) => {
   if (!restaurant.isOpen) {
     return res.status(400).json({ message: "Restaurant is currently closed" });
   }
+
+  const distance = getDistance(
+    address.location.coordinates[1],
+    address.location.coordinates[0],
+    restaurant.autoLocation.coordinates[1],
+    restaurant.autoLocation.coordinates[0],
+  );
 
   // Additional validation to ensure all cart items belong to the same restaurant
   for (const cartItem of cartItems) {
@@ -135,12 +165,72 @@ export const createOrder = TryCatch(async (req: AuthenticatedRequest, res) => {
   });
 });
 
+// export const fetchOrderForPayment = TryCatch(
+//   async (req: AuthenticatedRequest, res) => {
+//     if (req.headers["x-internal-key"] !== process.env.INTERNAL_SERVICE_KEY) {
+//       return res.status(403).json({ message: "Forbidden" });
+//     }
+
+//     const order = await Order.findById(req.params.id);
+
+//     if (!order) {
+//       return res.status(404).json({ message: "Order not found" });
+//     }
+
+//     if (order.paymentStatus !== "pending") {
+//       return res
+//         .status(400)
+//         .json({ message: "Payment already processed for this order" });
+//     }
+    
+//     if (req.headers["x-internal-key"] === process.env.INTERNAL_SERVICE_KEY) {
+//       // internal service → allow
+//     } else if (req.headers.authorization) {
+//       // user request → verify JWT
+//     } else {
+//       return res.status(401).json({ message: "Unauthorized" });
+//     }
+
+//     res.json({
+//       orderId: order._id.toString(),
+//       amount: order.grandTotal,
+//       currency: "INR",
+//     });
+//   },
+// );
+
 export const fetchOrderForPayment = TryCatch(
   async (req: AuthenticatedRequest, res) => {
-    if (req.headers["x-internal-key"] !== process.env.INTERNAL_SERVICE_KEY) {
-      return res.status(403).json({ message: "Forbidden" });
+    const internalKey = req.headers["x-internal-key"];
+    const authHeader = req.headers.authorization;
+
+    // ✅ INTERNAL SERVICE
+    if (internalKey === process.env.INTERNAL_SERVICE_KEY) {
+      // allow
     }
 
+    // ✅ USER REQUEST (JWT)
+    else if (authHeader) {
+      const token = authHeader.split(" ")[1];
+
+      if (!token) {
+        return res.status(401).json({ message: "Unauthorized" });
+      }
+
+      try {
+        const decoded = jwt.verify(token, process.env.JWT_SECRET!);
+        req.user = decoded as any;
+      } catch {
+        return res.status(401).json({ message: "Invalid token" });
+      }
+    }
+
+    // ❌ NO AUTH
+    else {
+      return res.status(401).json({ message: "Unauthorized" });
+    }
+
+    // ✅ ACTUAL LOGIC (runs after auth passes)
     const order = await Order.findById(req.params.id);
 
     if (!order) {
