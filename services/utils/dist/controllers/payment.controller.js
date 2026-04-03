@@ -16,7 +16,7 @@ export const createRazorpayOrder = async (req, res) => {
     });
     res.json({
         razorpayOrderId: razorpayOrder.id,
-        key: process.env.RAZOR_PAY_KEY_SECRET,
+        key: process.env.RAZOR_PAY_API_KEY,
     });
 };
 export const verifyRazorpayPayment = async (req, res) => {
