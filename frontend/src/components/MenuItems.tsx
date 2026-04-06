@@ -8,6 +8,7 @@ import { restaurantService } from "../main";
 import toast from "react-hot-toast";
 import { useAppData } from "../context/AppContext";
 import type { IMenuItem } from "../types";
+import { FaCircle } from "react-icons/fa6";
 interface MenuItemsProps {
   isSeller: boolean;
   menuItems: IMenuItem[];
@@ -140,6 +141,14 @@ const MenuItems = ({ isSeller, menuItems, onDeleteItems }: MenuItemsProps) => {
                   <p className="text-lg font-medium">
                     ₹{item.price.toFixed(2)}
                   </p>
+                  <div className="flex items-center gap-1">
+                    <FaCircle
+                      className={`${item.isVeg ? "text-green-600" : "text-red-600"} text-xs`}
+                    />
+                    <span className="text-xs text-gray-500">
+                      {item.isVeg ? "Veg" : "Non-Veg"}
+                    </span>
+                  </div>
                   {isSeller && (
                     <div>
                       <button

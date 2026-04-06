@@ -14,23 +14,26 @@ const AddMenuItem = ({ onItemAdded }: AddMenuItemProps) => {
   const [price, setPrice] = useState("");
   const [image, setImage] = useState<File | null>(null);
   const [loading, setLoading] = useState(false);
+  const [isVeg, setIsVeg] = useState(false);
 
   const resetForm = () => {
     setName("");
     setDescription("");
     setPrice("");
+    setIsVeg(false);
     setImage(null);
   };
 
   const handleSubmit = async () => {
-    if (!name || !price || !image) {
-      alert("Please fill in all required fields (Name, Price, Image)");
+    if (!name || !price || isVeg === undefined || !image) {
+      alert("Please fill in all required fields (Name, Price, isVeg, Image)");
       return;
     }
     const formData = new FormData();
     formData.append("name", name);
     formData.append("description", description);
     formData.append("price", price);
+    formData.append("isVeg", isVeg.toString());
     formData.append("image", image);
 
     try {
@@ -58,7 +61,7 @@ const AddMenuItem = ({ onItemAdded }: AddMenuItemProps) => {
   };
   return (
     <div className="max-w-md space-y-4 mx-auto">
-      <h2 className="text-lg font-semibold">Add Menu Item</h2>
+      {/* <h2 className="text-lg font-semibold">Add Menu Item</h2> */}
       {/* Name Input */}
       <input
         type="text"
@@ -85,6 +88,7 @@ const AddMenuItem = ({ onItemAdded }: AddMenuItemProps) => {
         onChange={(e) => setPrice(e.target.value)}
         className="w-full border border-gray-200 rounded-lg text-sm outline-none px-4 py-3 focus:ring-1 focus:ring-gray-300"
       />
+
       {/* Image Upload */}
       <label className="cursor-pointer flex items-center gap-3 rounded-lg border border-gray-200 px-4 py-3 text-sm text-gray-500 hover:bg-gray-100">
         <BiUpload className="h-5 w-5 text-red-500" />
@@ -96,6 +100,19 @@ const AddMenuItem = ({ onItemAdded }: AddMenuItemProps) => {
           hidden
         />
       </label>
+
+      {/* Veg/Non-Veg Toggle */}
+      <div className="flex items-center gap-4">
+        <label className="flex items-center gap-2 cursor-pointer">
+          <input
+            type="checkbox"
+            checked={isVeg}
+            onChange={(e) => setIsVeg(e.target.checked)}
+            className="form-checkbox h-5 w-5 text-green-500"
+          />
+          <span className="text-sm text-gray-700">Vegetarian</span>
+        </label>
+      </div>
 
       <button
         onClick={handleSubmit}

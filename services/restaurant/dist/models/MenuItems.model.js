@@ -27,5 +27,10 @@ const MenuItemSchema = new Schema({
         default: true,
         required: true,
     },
+    isVeg: {
+        type: Boolean,
+        default: false,
+        required: true,
+    },
 }, { timestamps: true });
 export const MenuItem = mongoose.model("MenuItem", MenuItemSchema);
