@@ -83,12 +83,29 @@ export const AppProvider = ({ children }: AppProviderProps) => {
   useEffect(() => {
     if (!navigator.geolocation)
       return alert("Please allow location access to use the service");
-    setLoadingLocation(true);
+
+    let isCalled = false;
+
     navigator.geolocation.getCurrentPosition(async (position) => {
+      if (isCalled) return;
+      isCalled = true;
+
       const { latitude, longitude } = position.coords;
       try {
+        setLoadingLocation(true);
+
         const response = await axios.get(
-          `https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}`,
+          `https://nominatim.openstreetmap.org/reverse`,
+          {
+            params: {
+              format: "json",
+              lat: latitude,
+              lon: longitude,
+            },
+            headers: {
+              "User-Agent": "zomatoes-app", // REQUIRED
+            },
+          },
         );
 
         setLocation({

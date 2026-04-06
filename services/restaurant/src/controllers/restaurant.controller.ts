@@ -247,3 +247,4 @@ export const fetchSingleRestaurant = TryCatch(
     res.status(200).json({ success: true, restaurant });
   },
 );
+
