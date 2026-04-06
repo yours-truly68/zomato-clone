@@ -168,7 +168,6 @@ export const getNearbyRestaurants = TryCatch(async (req, res) => {
         { $limit: 20 },
     ]);
     res
-        .status(200)
         .json({ success: true, count: restaurants.length, restaurants });
 });
 export const fetchSingleRestaurant = TryCatch(async (req, res) => {

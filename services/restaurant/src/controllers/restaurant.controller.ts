@@ -226,7 +226,6 @@ export const getNearbyRestaurants = TryCatch(
     ]);
 
     res
-      .status(200)
       .json({ success: true, count: restaurants.length, restaurants });
   },
 );
