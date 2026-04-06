@@ -12,12 +12,16 @@ export const addMenuItem = TryCatch(async (req: AuthenticatedRequest, res) => {
   const restaurant = await Restaurant.findOne({
     ownerId: req.user._id,
   });
+
   if (!restaurant) {
     return res.status(404).json({ message: "Restaurant not found" });
   }
-  const { name, description, price } = req.body;
-  if (!name || !price) {
-    return res.status(400).json({ message: "Name and price are required" });
+
+  const { name, description, price, isVeg } = req.body;
+  if (!name || !price || isVeg === undefined) {
+    return res
+      .status(400)
+      .json({ message: "Name, price, and isVeg are required" });
   }
   const file = req.file;
   if (!file) {
@@ -45,6 +49,7 @@ export const addMenuItem = TryCatch(async (req: AuthenticatedRequest, res) => {
     price,
     restaurantId: restaurant._id,
     image: imageUrl,
+    isVeg,
   });
 
   res.status(201).json({ message: "Menu item added successfully", menuItem });
@@ -106,7 +111,6 @@ export const toggleMenuItemAvailability = TryCatch(
     const restaurant = await Restaurant.findById({
       _id: menuItem.restaurantId,
     });
-    
 
     if (!restaurant) {
       return res.status(403).json({
@@ -117,7 +121,6 @@ export const toggleMenuItemAvailability = TryCatch(
 
     menuItem.isAvailable = !menuItem.isAvailable;
     await menuItem.save();
-  
 
     return res.status(200).json({
       message: `Menu item is now ${menuItem.isAvailable ? "available" : "unavailable"}`,

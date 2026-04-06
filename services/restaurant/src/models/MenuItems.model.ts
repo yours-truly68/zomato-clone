@@ -9,6 +9,7 @@ export interface IMenuItem extends Document {
   isAvailable: boolean;
   createdAt: Date;
   updatedAt: Date;
+  isVeg: boolean;
 }
 
 const MenuItemSchema = new Schema<IMenuItem>(
@@ -38,6 +39,11 @@ const MenuItemSchema = new Schema<IMenuItem>(
     isAvailable: {
       type: Boolean,
       default: true,
+      required: true,
+    },
+    isVeg: {
+      type: Boolean,
+      default: false,
       required: true,
     },
   },

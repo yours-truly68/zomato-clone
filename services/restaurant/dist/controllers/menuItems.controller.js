@@ -13,9 +13,11 @@ export const addMenuItem = TryCatch(async (req, res) => {
     if (!restaurant) {
         return res.status(404).json({ message: "Restaurant not found" });
     }
-    const { name, description, price } = req.body;
-    if (!name || !price) {
-        return res.status(400).json({ message: "Name and price are required" });
+    const { name, description, price, isVeg } = req.body;
+    if (!name || !price || isVeg === undefined) {
+        return res
+            .status(400)
+            .json({ message: "Name, price, and isVeg are required" });
     }
     const file = req.file;
     if (!file) {
@@ -42,6 +44,7 @@ export const addMenuItem = TryCatch(async (req, res) => {
         price,
         restaurantId: restaurant._id,
         image: imageUrl,
+        isVeg,
     });
     res.status(201).json({ message: "Menu item added successfully", menuItem });
 });

@@ -55,6 +55,7 @@ export interface IMenuItem {
   isAvailable: boolean;
   createdAt: Date;
   updatedAt: Date;
+  isVeg: boolean;
 }
 
 export interface ICart {
