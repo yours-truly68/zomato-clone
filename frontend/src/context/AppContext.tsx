@@ -95,28 +95,25 @@ export const AppProvider = ({ children }: AppProviderProps) => {
         setLoadingLocation(true);
 
         const response = await axios.get(
-          `https://nominatim.openstreetmap.org/reverse`,
+          `${restaurantService}/api/location/reverse`,
           {
             params: {
-              format: "json",
               lat: latitude,
               lon: longitude,
             },
-            headers: {
-              "User-Agent": "zomatoes-app", // REQUIRED
-            },
           },
         );
+        const locationData = response.data.location;
 
         setLocation({
           latitude,
           longitude,
-          formattedAddress: response.data.display_name || "current city",
+          formattedAddress: locationData.display_name || "current city",
         });
         setCity(
-          response.data.address.city ||
-            response.data.address.town ||
-            response.data.address.village ||
+          locationData.address.city ||
+            locationData.address.town ||
+            locationData.address.village ||
             "Your Location",
         );
         setLoadingLocation(false);
