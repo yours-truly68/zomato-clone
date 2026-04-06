@@ -145,7 +145,6 @@ const Checkout = () => {
             });
 
             toast.success("Payment successful!");
-            fetchCart();
             navigate(`/paymentsuccess/${response.razorpay_payment_id}`);
           } catch (error) {
             console.error("Error verifying payment:", error);
