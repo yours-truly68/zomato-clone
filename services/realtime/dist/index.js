@@ -11,6 +11,6 @@ app.use(express.urlencoded({ limit: "50mb", extended: true }));
 const server = createServer(app);
 initSocket(server);
 const PORT = process.env.PORT || 8003;
-app.listen(PORT, () => {
+server.listen(PORT, () => {
     console.log(`Realtime is listenting on port: ${PORT}`);
 });

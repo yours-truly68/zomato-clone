@@ -11,11 +11,11 @@ export const initSocket = (server) => {
         try {
             const token = socket.handshake.auth?.token;
             if (!token) {
-                return next(new Error("Authentication error: No token provided"));
+                return next(new Error("Authentication error: No token provided - Socket handshake auth token is missing"));
             }
             const decoded = jwt.verify(token, process.env.JWT_SECRET);
             if (!decoded || !decoded.user) {
-                return next(new Error("Authentication error: Invalid token"));
+                return next(new Error("Authentication error: Invalid token - Socket handshake auth token is invalid"));
             }
             // Attach user info to socket object for later use
             socket.data.user = decoded.user;
@@ -23,7 +23,7 @@ export const initSocket = (server) => {
         }
         catch (error) {
             console.error("Socket authentication error:", error);
-            next(new Error("Authentication error"));
+            next(new Error("Authentication error - Socket handshake auth token is invalid"));
         }
     });
     io.on("connection", (socket) => {
