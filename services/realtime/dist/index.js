@@ -12,7 +12,7 @@ app.use(express.urlencoded({ limit: "50mb", extended: true }));
 app.use("/api/v1/internal", internalRoutes);
 const server = createServer(app);
 initSocket(server);
-const PORT = process.env.PORT || 8003;
+const PORT = process.env.PORT || 8004;
 server.listen(PORT, () => {
     console.log(`Realtime is listening on port: ${PORT}`);
 });
