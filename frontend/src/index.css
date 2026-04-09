@@ -1,16 +1,15 @@
 @import "tailwindcss";
-*,
-*::before,
-*::after {
-  font-family: "Poppins", "Satoshi", sans-serif;
+body {
+  font-family: "Poppins", "Satoshi", system-ui, sans-serif;
 }
-
 button {
   font-family: "Poppins", "Satoshi", sans-serif;
 }
 
 /* Ensure your font is imported, e.g., from Google Fonts */
-
+.poppins {
+  font-family: "Poppins", "Satoshi", sans-serif;
+}
 
 .custom-toast-font {
   font-family: "Roboto", sans-serif !important; /* Change the font family */
@@ -22,7 +21,6 @@ button {
 .custom-toast-wrapper .Toastify__toast-body {
   font-family: "Roboto", sans-serif !important;
 }
-
 
 h3 {
   font-weight: 600;

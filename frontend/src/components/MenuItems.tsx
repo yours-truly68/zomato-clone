@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { BsCartPlus, BsEye } from "react-icons/bs";
+import { BsBookmarkFill, BsCartPlus, BsEye } from "react-icons/bs";
 import { FiEyeOff } from "react-icons/fi";
 import { BiTrash } from "react-icons/bi";
 import { VscLoading } from "react-icons/vsc";
@@ -106,7 +106,7 @@ const MenuItems = ({ isSeller, menuItems, onDeleteItems }: MenuItemsProps) => {
     }
   };
   return (
-    <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 ">
+    <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 poppins">
       {menuItems &&
         menuItems.map((item) => {
           const isLoading = loadingItemId === item._id;
@@ -116,6 +116,14 @@ const MenuItems = ({ isSeller, menuItems, onDeleteItems }: MenuItemsProps) => {
               key={item._id}
               className={`relative flex gap-4 rounded-lg bg-white p-4 shadow-sm transition hover:shadow-md max-w-sm ${!item.isAvailable ? "opacity-50" : ""}`}
             >
+              {/* <div className="absolute top-3 right-3">
+                <BsBookmarkFill
+                  size={24}
+                  className={`text-lg ${
+                    item.isVeg ? "text-green-500" : "text-red-500"
+                  }`}
+                />
+              </div> */}
               <div className="relative shrink-0">
                 <img
                   src={item.image}
@@ -138,10 +146,10 @@ const MenuItems = ({ isSeller, menuItems, onDeleteItems }: MenuItemsProps) => {
                   )}
                 </div>
                 <div className="mt-2 flex items-center justify-between gap-4">
-                  <p className="text-lg font-medium">
-                    ₹{item.price.toFixed(2)}
-                  </p>
-                  <div className="flex items-center gap-1">
+                  <p className="text-lg font-medium">₹{item.price}</p>
+                  <div
+                    className={`flex items-center gap-1 py-1 px-2 rounded-full ${item.isVeg ? "bg-green-100" : "bg-red-100"}`}
+                  >
                     <FaCircle
                       className={`${item.isVeg ? "text-green-600" : "text-red-600"} text-xs`}
                     />
