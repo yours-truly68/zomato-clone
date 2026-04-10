@@ -122,7 +122,7 @@ export const updateRestaurantStatus = TryCatch(
         ownerId: req.user._id,
       },
       { isOpen: status },
-      { new: true },
+      { returnDocument: "after" },
     );
 
     if (!restaurant) {

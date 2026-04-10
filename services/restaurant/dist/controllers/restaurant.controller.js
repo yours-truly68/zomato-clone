@@ -88,7 +88,7 @@ export const updateRestaurantStatus = TryCatch(async (req, res) => {
     }
     const restaurant = await Restaurant.findOneAndUpdate({
         ownerId: req.user._id,
-    }, { isOpen: status }, { new: true });
+    }, { isOpen: status }, { returnDocument: "after" });
     if (!restaurant) {
         return res.status(404).json({ message: "Restaurant not found" });
     }
