@@ -182,7 +182,7 @@ export const createOrder = TryCatch(async (req: AuthenticatedRequest, res) => {
 //         .status(400)
 //         .json({ message: "Payment already processed for this order" });
 //     }
-    
+
 //     if (req.headers["x-internal-key"] === process.env.INTERNAL_SERVICE_KEY) {
 //       // internal service → allow
 //     } else if (req.headers.authorization) {
@@ -248,5 +248,91 @@ export const fetchOrderForPayment = TryCatch(
       amount: order.grandTotal,
       currency: "INR",
     });
+  },
+);
+
+export const fetchRestaurantOrders = TryCatch(
+  async (req: AuthenticatedRequest, res) => {
+    const user = req.user;
+    if (!user) {
+      return res.status(401).json({ message: "Unauthorized" });
+    }
+
+    const { restaurantId } = req.params;
+
+    if (!restaurantId) {
+      return res.status(400).json({ message: "Restaurant ID is required" });
+    }
+
+    const { limit } = req.query;
+
+    const orders = await Order.find({
+      restaurantId,
+      paymentStatus: "paid",
+    })
+      .sort({ createdAt: -1 })
+      .limit(Number(limit));
+
+    res.json({
+      success: true,
+      count: orders.length,
+      orders,
+    });
+  },
+);
+
+const validStatuses = ["accepted", "preparing", "ready for pickup"] as const;
+
+export const updateOrderStatus = TryCatch(
+  async (req: AuthenticatedRequest, res) => {
+    const user = req.user;
+    if (!user) {
+      return res.status(401).json({ message: "Unauthorized" });
+    }
+
+    const { orderId } = req.params;
+
+    if (!orderId) {
+      return res.status(400).json({ message: "Order ID is required" });
+    }
+
+    const { status } = req.body;
+
+    if (!status || !validStatuses.includes(status)) {
+      return res.status(400).json({
+        message: `Status is required and must be one of: ${validStatuses.join(", ")}`,
+      });
+    }
+
+    const order = await Order.findById(orderId);
+
+    if (!order) {
+      return res.status(404).json({ message: "Order not found" });
+    }
+
+    if (order.paymentStatus !== "paid") {
+      return res
+        .status(400)
+        .json({ message: "Cannot update status of an unpaid order" });
+    }
+
+    const restaurant = await Restaurant.findById(order.restaurantId);
+
+    if (!restaurant) {
+      return res
+        .status(404)
+        .json({ message: "Associated restaurant not found" });
+    }
+
+    if (restaurant.ownerId.toString() !== user._id.toString()) {
+      return res
+        .status(403)
+        .json({ message: "Forbidden: You do not own this restaurant" });
+    }
+
+    order.status = status;
+    await order.save();
+
+    res.json({ message: "Order status updated successfully", order });
   },
 );
