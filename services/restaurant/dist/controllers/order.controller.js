@@ -1,3 +1,4 @@
+import axios from "axios";
 import TryCatch from "../middlewares/TryCatch.middleware.js";
 import Address from "../models/Address.model.js";
 import Cart from "../models/Cart.model.js";
@@ -248,5 +249,54 @@ export const updateOrderStatus = TryCatch(async (req, res) => {
     }
     order.status = status;
     await order.save();
+    axios.post(`${process.env.REALTIME_URL}/api/v1/internal/emit`, {
+        event: "order:updated",
+        room: order._id,
+        status: order.status,
+    }, {
+        headers: {
+            "x-internal-key": process.env.INTERNAL_SERVICE_KEY,
+        },
+    });
+    // Emit real-time update to the user about order status change (not implemented here)
+    // You can use WebSockets or a service like Pusher to notify the user in real-time
     res.json({ message: "Order status updated successfully", order });
+});
+export const getMyOrders = TryCatch(async (req, res) => {
+    const user = req.user;
+    if (!user) {
+        return res.status(401).json({ message: "Unauthorized" });
+    }
+    const orders = await Order.find({
+        userId: user._id.toString(),
+        paymentStatus: "paid",
+    }).sort({ createdAt: -1 });
+    res.json({
+        success: true,
+        count: orders.length,
+        orders,
+    });
+});
+export const getSingleOrder = TryCatch(async (req, res) => {
+    const user = req.user;
+    if (!user) {
+        return res.status(401).json({ message: "Unauthorized" });
+    }
+    const { orderId } = req.params;
+    if (!orderId) {
+        return res.status(400).json({ message: "Order ID is required" });
+    }
+    const order = await Order.findById(orderId);
+    if (!order) {
+        return res.status(404).json({ message: "Order not found" });
+    }
+    if (order.userId.toString() !== user._id.toString()) {
+        return res
+            .status(403)
+            .json({ message: "Forbidden: You do not own this order" });
+    }
+    res.json({
+        success: true,
+        order,
+    });
 });
