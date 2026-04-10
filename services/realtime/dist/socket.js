@@ -38,7 +38,7 @@ export const initSocket = (server) => {
         if (user.restaurantId) {
             socket.join(`restaurant_${user.restaurantId}`);
         }
-        console.log(`User ${user.name}}`);
+        console.log(`User ${user.name}`);
         console.log(`Socket: `, [...socket.rooms]);
         socket.on("disconnect", () => {
             console.log(`User disconnected: ${socket.data.user.name}`);

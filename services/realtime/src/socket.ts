@@ -16,7 +16,11 @@ export const initSocket = (server: http.Server) => {
       const token = socket.handshake.auth?.token;
 
       if (!token) {
-        return next(new Error("Authentication error: No token provided - Socket handshake auth token is missing"));
+        return next(
+          new Error(
+            "Authentication error: No token provided - Socket handshake auth token is missing",
+          ),
+        );
       }
       const decoded = jwt.verify(
         token,
@@ -24,7 +28,11 @@ export const initSocket = (server: http.Server) => {
       ) as any;
 
       if (!decoded || !decoded.user) {
-        return next(new Error("Authentication error: Invalid token - Socket handshake auth token is invalid"));
+        return next(
+          new Error(
+            "Authentication error: Invalid token - Socket handshake auth token is invalid",
+          ),
+        );
       }
 
       // Attach user info to socket object for later use
@@ -33,7 +41,11 @@ export const initSocket = (server: http.Server) => {
       next();
     } catch (error) {
       console.error("Socket authentication error:", error);
-      next(new Error("Authentication error - Socket handshake auth token is invalid"));
+      next(
+        new Error(
+          "Authentication error - Socket handshake auth token is invalid",
+        ),
+      );
     }
   });
 
@@ -53,7 +65,7 @@ export const initSocket = (server: http.Server) => {
       socket.join(`restaurant_${user.restaurantId}`);
     }
 
-    console.log(`User ${user.name}}`);
+    console.log(`User ${user.name}`);
     console.log(`Socket: `, [...socket.rooms]);
 
     socket.on("disconnect", () => {
