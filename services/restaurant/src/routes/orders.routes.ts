@@ -4,6 +4,8 @@ import {
   createOrder,
   fetchOrderForPayment,
   fetchRestaurantOrders,
+  getMyOrders,
+  getSingleOrder,
   updateOrderStatus,
 } from "../controllers/order.controller.js";
 
@@ -13,5 +15,6 @@ router.post("/new", isAuth, createOrder);
 router.get("/payment/:id", fetchOrderForPayment);
 router.get("/:restaurantId", fetchRestaurantOrders);
 router.put("/:orderId", isAuth, isSeller, updateOrderStatus);
-
+router.get("/my", isAuth, getMyOrders);
+router.get("/my/:orderId", isAuth, getSingleOrder);
 export default router;
