@@ -13,7 +13,7 @@ const router = Router();
 
 router.post("/new", isAuth, createOrder);
 router.get("/payment/:id", fetchOrderForPayment);
-router.get("/:restaurantId", fetchRestaurantOrders);
+router.get("/:restaurantId", isAuth, isSeller, fetchRestaurantOrders);
 router.put("/:orderId", isAuth, isSeller, updateOrderStatus);
 router.get("/my", isAuth, getMyOrders);
 router.get("/my/:orderId", isAuth, getSingleOrder);

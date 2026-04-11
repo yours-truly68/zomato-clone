@@ -45,11 +45,15 @@ const RestaurantOrders = ({ restaurantId }: { restaurantId: string }) => {
 
   const fetchOrders = async () => {
     try {
+      const token = localStorage.getItem("token");
+      if (!token) {
+        throw new Error("Authentication token not found");
+      }
       const { data } = await axios.get(
         `${restaurantService}/api/order/${restaurantId}`,
         {
           headers: {
-            Authorization: `Bearer ${localStorage.getItem("token")}`,
+            Authorization: `Bearer ${token}`,
           },
         },
       );

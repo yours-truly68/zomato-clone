@@ -192,9 +192,10 @@ export const fetchOrderForPayment = TryCatch(async (req, res) => {
 export const fetchRestaurantOrders = TryCatch(async (req, res) => {
     const user = req.user;
     if (!user) {
-        return res.status(401).json({ message: "Unauthorized" });
+        return res.status(401).json({ message: "Unauthorized - User not found" });
     }
     const { restaurantId } = req.params;
+    console.log("Fetching orders for restaurant ID:", restaurantId);
     if (!restaurantId) {
         return res.status(400).json({ message: "Restaurant ID is required" });
     }
@@ -205,6 +206,7 @@ export const fetchRestaurantOrders = TryCatch(async (req, res) => {
     })
         .sort({ createdAt: -1 })
         .limit(Number(limit));
+    console.log(`Found ${orders.length} orders for restaurant ID ${restaurantId} and order IDs ${orders.map((o) => o._id).join(", ")}`);
     res.json({
         success: true,
         count: orders.length,
@@ -215,7 +217,7 @@ const validStatuses = ["accepted", "preparing", "ready for pickup"];
 export const updateOrderStatus = TryCatch(async (req, res) => {
     const user = req.user;
     if (!user) {
-        return res.status(401).json({ message: "Unauthorized" });
+        return res.status(401).json({ message: "Unauthorized - User not found" });
     }
     const { orderId } = req.params;
     if (!orderId) {
@@ -283,7 +285,7 @@ export const getMyOrders = TryCatch(async (req, res) => {
 export const getSingleOrder = TryCatch(async (req, res) => {
     const user = req.user;
     if (!user) {
-        return res.status(401).json({ message: "Unauthorized" });
+        return res.status(401).json({ message: "Unauthorized - User not found" });
     }
     const { orderId } = req.params;
     if (!orderId) {
