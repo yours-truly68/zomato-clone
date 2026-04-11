@@ -39,15 +39,14 @@ export const startPaymentConsumer = async () => {
             //socket work
             //TODO: emit event to restaurant service to notify about new order
             await axios.post(`${process.env.REALTIME_URL}/api/v1/internal/emit`, {
-                event: "order:updated",
-                room: `user:${order.userId}`,
+                event: "order:new",
+                room: `restaurant:${order.restaurantId}`,
                 payload: {
                     orderId: order._id,
-                    status: order.status,
                 },
             }, {
                 headers: {
-                    "x-internal-service": process.env.INTERNAL_SERVICE_KEY,
+                    "x-internal-key": process.env.INTERNAL_SERVICE_KEY,
                 },
             });
             channel.ack(msg);

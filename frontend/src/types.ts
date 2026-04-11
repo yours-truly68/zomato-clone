@@ -67,3 +67,52 @@ export interface ICart {
   createdAt: Date;
   updatedAt: Date;
 }
+
+export interface IOrder {
+  _id: string;
+  userId: string;
+  restaurantId: string;
+  restaurantName: string;
+  riderId?: string | null;
+  riderPhone: number | null;
+  riderName: string | null;
+  distance: number;
+  riderAmount: number;
+
+  items: {
+    itemId: string;
+    name: string;
+    price: number;
+    quantity: number;
+  }[];
+
+  subTotal: number;
+  deliveryCharges: number;
+  platformCharges: number;
+  grandTotal: number;
+
+  addressId: string;
+  deliveryAddress: {
+    formattedAddress: string;
+    phone: number;
+    latitude: number;
+    longitude: number;
+  };
+
+  status:
+    | "placed"
+    | "accepted"
+    | "preparing"
+    | "ready_for_pickup"
+    | "rider_assigned"
+    | "out_for_delivery"
+    | "delivered"
+    | "cancelled";
+
+  paymentMethod: "razorpay" | "stripe";
+  paymentStatus: "pending" | "paid" | "failed";
+
+  expiresAt: Date;
+  createdAt: Date;
+  updatedAt: Date;
+}
