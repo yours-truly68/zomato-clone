@@ -338,8 +338,11 @@ export const updateOrderStatus = TryCatch(
       `${process.env.REALTIME_URL}/api/v1/internal/emit`,
       {
         event: "order:updated",
-        room: order._id,
-        status: order.status,
+        room: `user:${order.userId}`,
+        payload: {
+          orderId: order._id,
+          status: order.status,
+        },
       },
       {
         headers: {

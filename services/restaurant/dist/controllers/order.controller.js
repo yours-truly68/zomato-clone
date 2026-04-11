@@ -251,8 +251,11 @@ export const updateOrderStatus = TryCatch(async (req, res) => {
     await order.save();
     axios.post(`${process.env.REALTIME_URL}/api/v1/internal/emit`, {
         event: "order:updated",
-        room: order._id,
-        status: order.status,
+        room: `user:${order.userId}`,
+        payload: {
+            orderId: order._id,
+            status: order.status,
+        },
     }, {
         headers: {
             "x-internal-key": process.env.INTERNAL_SERVICE_KEY,
