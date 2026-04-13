@@ -206,7 +206,9 @@ export const fetchRestaurantOrders = TryCatch(async (req, res) => {
     })
         .sort({ createdAt: -1 })
         .limit(Number(limit));
-    console.log(`Found ${orders.length} orders for restaurant ID ${restaurantId} and order IDs ${orders.map((o) => o._id).join(", ")}`);
+    // console.log(
+    //   `Found ${orders.length} orders for restaurant ID ${restaurantId} and order IDs ${orders.map((o) => o._id).join(", ")}`,
+    // );
     res.json({
         success: true,
         count: orders.length,
@@ -250,7 +252,7 @@ export const updateOrderStatus = TryCatch(async (req, res) => {
             .json({ message: "Forbidden: You do not own this restaurant" });
     }
     order.status = status;
-    await order.save();
+    await order.save({ validateBeforeSave: false });
     axios.post(`${process.env.REALTIME_URL}/api/v1/internal/emit`, {
         event: "order:updated",
         room: `user:${order.userId}`,

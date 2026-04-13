@@ -275,9 +275,9 @@ export const fetchRestaurantOrders = TryCatch(
       .sort({ createdAt: -1 })
       .limit(Number(limit));
 
-    console.log(
-      `Found ${orders.length} orders for restaurant ID ${restaurantId} and order IDs ${orders.map((o) => o._id).join(", ")}`,
-    );
+    // console.log(
+    //   `Found ${orders.length} orders for restaurant ID ${restaurantId} and order IDs ${orders.map((o) => o._id).join(", ")}`,
+    // );
 
     res.json({
       success: true,
@@ -337,8 +337,9 @@ export const updateOrderStatus = TryCatch(
     }
 
     order.status = status;
-    await order.save();
+    await order.save({ validateBeforeSave: false });
 
+    
     axios.post(
       `${process.env.REALTIME_URL}/api/v1/internal/emit`,
       {
