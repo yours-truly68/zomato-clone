@@ -70,7 +70,108 @@ const RestaurantOrders = ({ restaurantId }: { restaurantId: string }) => {
     fetchOrders();
   }, [restaurantId]);
 
-  return <div>Restaurant Orders</div>;
+  useEffect(() => {
+    if (!socket) return;
+
+    const onNewOrder = () => {
+      console.log("New order received via socket");
+      if (audioUnlocked && audioRef.current) {
+        audioRef.current.currentTime = 0;
+        audioRef.current.play().catch((err) => {
+          console.error("Error playing notification sound: ", err);
+        });
+      }
+
+      fetchOrders();
+    };
+    socket.on("order:new", onNewOrder);
+
+    return () => {
+      socket.off("order:new", onNewOrder);
+    };
+  }, [socket, audioUnlocked]);
+
+  if (loading) {
+    return (
+      <div className="text-gray-500 flex justify-center items-center text-2xl">
+        Loading orders...
+      </div>
+    );
+  }
+
+  const activeOrders = orders.filter((order) =>
+    ALLOWED_ACTIVE_STATUSES.includes(order.status),
+  );
+
+  const completedOrders = orders.filter((order) => {
+    return !ALLOWED_ACTIVE_STATUSES.includes(order.status);
+  });
+
+  return (
+    <div className="space-y-6">
+      {!audioUnlocked && (
+        <div className="flex justify-between items-center bg-blue-50 border border-blue-200 p-4 rounded-lg ">
+          <div className="flex items-center gap-3">
+            <span className="text-2xl">🔊</span>
+            <div>
+              <p
+                className="text-blue-600 font-medium  cursor-pointer"
+                onClick={unlockAudio}
+              >
+                Enable Sound Notification{" "}
+              </p>
+              <p className="text-sm text-gray-400">
+                Get notified whenever a new order is placed!
+              </p>
+            </div>
+          </div>
+          <button
+            className="rounded-lg bg-blue-600 hover:bg-blue-700 text-white py-2 px-4 transition text-sm"
+            onClick={unlockAudio}
+          >
+            Enable Audio
+          </button>
+        </div>
+      )}
+
+      {/* {Active Orders} */}
+      <div className="space-y-3">
+        <h3 className="text-xl font-semibold">Active Orders</h3>
+        {activeOrders.length === 0 ? (
+          <p className="text-gray-500 text-center border border-gray-300 p-4 rounded-lg">No Active Orders</p>
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {activeOrders.map((order) => (
+              <div
+                key={order._id}
+                className="border border-gray-300 p-4 rounded-lg relative"
+              >
+                <p className="font-medium">Order ID: {order._id}</p>
+                <p className="text-sm text-gray-500">Status: {order.status}</p>
+                <span className=" absolute right-4 top-4 text-xs text-gray-500">{new Date(order.createdAt).toLocaleString()}</span>
+              </div>
+            ))}
+          </div>
+        )}
+        {/* {Completed Orders} */}
+        {completedOrders.length === 0 ? (
+          <p className="text-gray-500 text-center border border-gray-300 p-4 rounded-lg">No Completed Orders</p>
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {completedOrders.map((order) => (
+              <div
+                key={order._id}
+                className="border border-gray-300 p-4 rounded-lg"
+              >
+                <p className="font-medium">Order ID: {order._id}</p>
+                <p className="text-sm text-gray-500">Status: {order.status}</p>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+    </div>
+  );
 };
 
 export default RestaurantOrders;
