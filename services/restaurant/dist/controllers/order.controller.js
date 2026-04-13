@@ -215,7 +215,7 @@ export const fetchRestaurantOrders = TryCatch(async (req, res) => {
         orders,
     });
 });
-const validStatuses = ["accepted", "preparing", "ready for pickup"];
+const validStatuses = ["accepted", "preparing", "ready_for_pickup"];
 export const updateOrderStatus = TryCatch(async (req, res) => {
     const user = req.user;
     if (!user) {

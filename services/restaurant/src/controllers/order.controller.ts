@@ -287,7 +287,7 @@ export const fetchRestaurantOrders = TryCatch(
   },
 );
 
-const validStatuses = ["accepted", "preparing", "ready for pickup"] as const;
+const validStatuses = ["accepted", "preparing", "ready_for_pickup"] as const;
 
 export const updateOrderStatus = TryCatch(
   async (req: AuthenticatedRequest, res) => {
@@ -339,7 +339,7 @@ export const updateOrderStatus = TryCatch(
     order.status = status;
     await order.save({ validateBeforeSave: false });
 
-    
+
     axios.post(
       `${process.env.REALTIME_URL}/api/v1/internal/emit`,
       {
