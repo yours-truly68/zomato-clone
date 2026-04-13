@@ -4,6 +4,7 @@ import { useSocket } from "../context/SocketContext";
 import faahAudio from "../assets/faah_notification.mp3";
 import axios from "axios";
 import { restaurantService } from "../main";
+import OrderCard from "./OrderCard";
 
 const ALLOWED_ACTIVE_STATUSES = [
   "placed",
@@ -156,16 +157,7 @@ const RestaurantOrders = ({ restaurantId }: { restaurantId: string }) => {
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {activeOrders.map((order) => (
-              <div
-                key={order._id}
-                className="border border-gray-300 p-4 rounded-lg relative"
-              >
-                <p className="font-medium">Order ID: {order._id}</p>
-                <p className="text-sm text-gray-500">Status: {order.status}</p>
-                <span className=" absolute right-4 top-4 text-xs text-gray-500">
-                  {new Date(order.createdAt).toLocaleString()}
-                </span>
-              </div>
+                <OrderCard key={order._id} order={order} onStatusUpdate={fetchOrders} />
             ))}
           </div>
         )}
@@ -177,13 +169,7 @@ const RestaurantOrders = ({ restaurantId }: { restaurantId: string }) => {
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {completedOrders.map((order) => (
-              <div
-                key={order._id}
-                className="border border-gray-300 p-4 rounded-lg"
-              >
-                <p className="font-medium">Order ID: {order._id}</p>
-                <p className="text-sm text-gray-500">Status: {order.status}</p>
-              </div>
+                <OrderCard key={order._id} order={order} onStatusUpdate={fetchOrders} />
             ))}
           </div>
         )}
