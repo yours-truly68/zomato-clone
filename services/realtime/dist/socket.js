@@ -34,9 +34,9 @@ export const initSocket = (server) => {
             return;
         }
         const userId = user._id;
-        socket.join(`user_${userId}`);
+        socket.join(`user:${userId}`);
         if (user.restaurantId) {
-            socket.join(`restaurant_${user.restaurantId}`);
+            socket.join(`restaurant:${user.restaurantId}`);
         }
         console.log(`User ${user.name}`);
         console.log(`Socket: `, [...socket.rooms]);

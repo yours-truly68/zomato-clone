@@ -159,22 +159,6 @@ export const createOrder = TryCatch(async (req: AuthenticatedRequest, res) => {
 
   await Cart.deleteMany({ userId: user._id });
 
-  await axios.post(
-    `${process.env.REALTIME_URL}/api/v1/internal/emit`,
-    {
-      event: "order:new",
-      room: `restaurant:${restaurantId}`,
-      payload: {
-        orderId: order._id,
-      },
-    },
-    {
-      headers: {
-        "x-internal-key": process.env.INTERNAL_SERVICE_KEY!,
-      },
-    },
-  );
-
   res.status(201).json({
     message: "Order created successfully",
     orderId: order._id.toString(),

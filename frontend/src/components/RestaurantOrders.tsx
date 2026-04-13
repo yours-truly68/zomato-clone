@@ -74,22 +74,34 @@ const RestaurantOrders = ({ restaurantId }: { restaurantId: string }) => {
     if (!socket) return;
 
     const onNewOrder = () => {
-      console.log("New order received via socket");
-      if (audioUnlocked && audioRef.current) {
+      console.log("🔥 New order received");
+
+      if (audioRef.current) {
+        console.log("🔊 Trying to play audio...");
+
         audioRef.current.currentTime = 0;
-        audioRef.current.play().catch((err) => {
-          console.error("Error playing notification sound: ", err);
-        });
+
+        audioRef.current
+          .play()
+          .then(() => {
+            console.log("✅ Audio played successfully");
+          })
+          .catch((err) => {
+            console.error("❌ Audio failed:", err);
+          });
       }
 
       fetchOrders();
     };
     socket.on("order:new", onNewOrder);
+    socket.on("order:new", () => {
+      console.log("🔥 EVENT RECEIVED");
+    });
 
     return () => {
       socket.off("order:new", onNewOrder);
     };
-  }, [socket, audioUnlocked]);
+  }, [socket]);
 
   if (loading) {
     return (
@@ -138,7 +150,9 @@ const RestaurantOrders = ({ restaurantId }: { restaurantId: string }) => {
       <div className="space-y-3">
         <h3 className="text-xl font-semibold">Active Orders</h3>
         {activeOrders.length === 0 ? (
-          <p className="text-gray-500 text-center border border-gray-300 p-4 rounded-lg">No Active Orders</p>
+          <p className="text-gray-500 text-center border border-gray-300 p-4 rounded-lg">
+            No Active Orders
+          </p>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {activeOrders.map((order) => (
@@ -148,14 +162,18 @@ const RestaurantOrders = ({ restaurantId }: { restaurantId: string }) => {
               >
                 <p className="font-medium">Order ID: {order._id}</p>
                 <p className="text-sm text-gray-500">Status: {order.status}</p>
-                <span className=" absolute right-4 top-4 text-xs text-gray-500">{new Date(order.createdAt).toLocaleString()}</span>
+                <span className=" absolute right-4 top-4 text-xs text-gray-500">
+                  {new Date(order.createdAt).toLocaleString()}
+                </span>
               </div>
             ))}
           </div>
         )}
         {/* {Completed Orders} */}
         {completedOrders.length === 0 ? (
-          <p className="text-gray-500 text-center border border-gray-300 p-4 rounded-lg">No Completed Orders</p>
+          <p className="text-gray-500 text-center border border-gray-300 p-4 rounded-lg">
+            No Completed Orders
+          </p>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {completedOrders.map((order) => (
