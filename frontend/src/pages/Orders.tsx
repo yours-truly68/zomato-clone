@@ -109,7 +109,7 @@ const Orders = () => {
             <OrderRow
               key={order._id}
               order={order}
-              onClick={() => navigate(`/order/${order._id}`)}
+              onClick={() => navigate(`/orders/${order._id}`)}
             />
             //   <p className="font-medium">Order ID: {order._id}</p>
             //   <p>Status: {order.status}</p>
@@ -127,7 +127,7 @@ const Orders = () => {
             <OrderRow
               key={order._id}
               order={order}
-              onClick={() => navigate(`/order/${order._id}`)}
+              onClick={() => navigate(`/orders/${order._id}`)}
             />
           ))
         )}
