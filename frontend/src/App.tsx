@@ -6,7 +6,7 @@ import PublicRoute from "./components/publicRoute";
 import { SelectRole } from "./pages/SelectRole";
 import Navbar from "./components/Navbar";
 import Account from "./pages/Account";
-import { useAppData } from "./context/AppContext";
+// import { useAppData } from "./context/AppContext";
 import Restaurant from "./pages/Restaurant";
 import RestaurantPage from "./pages/RestaurantPage";
 import Cart from "./pages/Cart";
@@ -17,11 +17,11 @@ import Orders from "./pages/Orders";
 import OrderPage from "./pages/OrderPage";
 
 const App = () => {
-  const { user } = useAppData();
+  // const { user } = useAppData();
 
-  if (user && user.role === "seller") {
-    return <Restaurant />;
-  }
+  // if (user && user.role === "seller") {
+  //   return <Restaurant />;
+  // }
 
   return (
     <>
@@ -45,6 +45,7 @@ const App = () => {
               path={"/paymentsuccess/:paymentId"}
               element={<PageSuccess />}
             />
+            <Route path={"/seller"} element={<Restaurant />} />
           </Route>
         </Routes>
       </BrowserRouter>
