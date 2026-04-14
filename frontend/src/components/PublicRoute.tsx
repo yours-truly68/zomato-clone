@@ -11,6 +11,8 @@ const PublicRoute = () => {
   // 🔥 Role-based redirect
   if (user?.role === "seller") {
     return <Navigate to="/seller" replace />;
+  } else if (user?.role === "rider") {
+    return <Navigate to="/rider" replace />;
   }
 
   return <Navigate to="/" replace />;

@@ -15,6 +15,7 @@ import Checkout from "./pages/Checkout";
 import PageSuccess from "./pages/PageSuccess";
 import Orders from "./pages/Orders";
 import OrderPage from "./pages/OrderPage";
+import RiderDashboard from "./pages/RiderDashboard";
 
 const App = () => {
   // const { user } = useAppData();
@@ -46,6 +47,7 @@ const App = () => {
               element={<PageSuccess />}
             />
             <Route path={"/seller"} element={<Restaurant />} />
+            <Route path={"/rider"} element={<RiderDashboard />} />
           </Route>
         </Routes>
       </BrowserRouter>
