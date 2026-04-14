@@ -6,7 +6,7 @@ import PublicRoute from "./components/publicRoute";
 import { SelectRole } from "./pages/SelectRole";
 import Navbar from "./components/Navbar";
 import Account from "./pages/Account";
-// import { useAppData } from "./context/AppContext";
+import { useAppData } from "./context/AppContext";
 import Restaurant from "./pages/Restaurant";
 import RestaurantPage from "./pages/RestaurantPage";
 import Cart from "./pages/Cart";
@@ -18,11 +18,18 @@ import OrderPage from "./pages/OrderPage";
 import RiderDashboard from "./pages/RiderDashboard";
 
 const App = () => {
-  // const { user } = useAppData();
+  const { user, loading } = useAppData();
 
-  // if (user && user.role === "seller") {
-  //   return <Restaurant />;
-  // }
+  if (loading)
+    return (
+      <div className="text-2xl font-bold flex justify-center items-center min-h-screen text-blue-600">
+        Loading...
+      </div>
+    );
+
+  if (user && user.role === "rider") {
+    return <RiderDashboard />;
+  }
 
   return (
     <>
@@ -47,7 +54,7 @@ const App = () => {
               element={<PageSuccess />}
             />
             <Route path={"/seller"} element={<Restaurant />} />
-            <Route path={"/rider"} element={<RiderDashboard />} />
+            {/* <Route path={"/rider"} element={<RiderDashboard />} />   */}
           </Route>
         </Routes>
       </BrowserRouter>
