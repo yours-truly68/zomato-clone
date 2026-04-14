@@ -1,7 +1,7 @@
 import jwt from "jsonwebtoken";
 const isAuth = async (req, res, next) => {
     try {
-        //check header for logint token
+        //check header for login token
         const authHeader = req.headers?.authorization;
         if (!authHeader || !authHeader.startsWith("Bearer ")) {
             res.status(401).json({

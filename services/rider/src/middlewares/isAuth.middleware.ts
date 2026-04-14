@@ -21,6 +21,7 @@ const isAuth = async (
 ): Promise<void> => {
   try {
     //check header for login token
+
     const authHeader = req.headers?.authorization;
     if (!authHeader || !authHeader.startsWith("Bearer ")) {
       res.status(401).json({
@@ -29,7 +30,8 @@ const isAuth = async (
       return;
     }
 
-    //extracting token from the header
+    //verifying the extracted token
+
     const token = authHeader.split(" ")[1];
 
     if (!token) {
@@ -38,8 +40,6 @@ const isAuth = async (
       });
       return;
     }
-
-    //verifying the extracted token
 
     const decodedValue = jwt.verify(
       token,
@@ -71,8 +71,10 @@ export const isSeller = (
 ) => {
   const user = req.user;
 
-  if (user && user.role !== "seller") {
-    res.status(401).json({ message: "Only sellers can perform this action" });
+  if (user && user.role === "seller") {
+    res.status(403).json({
+      message: "Access Denied - Sellers are not allowed to perform this action",
+    });
     return;
   }
 
