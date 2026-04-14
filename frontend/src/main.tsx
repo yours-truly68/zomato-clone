@@ -11,6 +11,7 @@ export const authService = "http://localhost:8000";
 export const restaurantService = "http://localhost:8001";
 export const utilServices = "http://localhost:8002";
 export const realtimeService = "http://localhost:8004";
+export const riderService = "http://localhost:8005";
 
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
