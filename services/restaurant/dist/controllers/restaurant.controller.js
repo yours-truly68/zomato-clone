@@ -24,6 +24,11 @@ export const addRestaurant = TryCatch(async (req, res) => {
     if (!file) {
         return res.status(400).json({ message: "Image file is required" });
     }
+    if (!file.mimetype.startsWith("image/")) {
+        return res.status(400).json({
+            message: "Only image files are allowed",
+        });
+    }
     const fileBuffer = getBuffer(file);
     if (!fileBuffer?.content) {
         return res.status(500).json({ message: "Failed to process image file" });
@@ -167,8 +172,7 @@ export const getNearbyRestaurants = TryCatch(async (req, res) => {
         },
         { $limit: 20 },
     ]);
-    res
-        .json({ success: true, count: restaurants.length, restaurants });
+    res.json({ success: true, count: restaurants.length, restaurants });
 });
 export const fetchSingleRestaurant = TryCatch(async (req, res) => {
     const { id } = req.params;
