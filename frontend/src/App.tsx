@@ -13,6 +13,7 @@ import Cart from "./pages/Cart";
 import Address from "./pages/Address";
 import Checkout from "./pages/Checkout";
 import PageSuccess from "./pages/PageSuccess";
+import Orders from "./pages/Orders";
 
 const App = () => {
   const { user } = useAppData();
@@ -31,6 +32,7 @@ const App = () => {
           </Route>
           <Route element={<ProtectedRoute />}>
             <Route path={"/"} element={<Home />} />
+            <Route path={"/orders"} element={<Orders />} />
             <Route path={"/restaurant/:id"} element={<RestaurantPage />} />
             <Route path={"/cart"} element={<Cart />} />
             <Route path={"/select-role"} element={<SelectRole />} />
