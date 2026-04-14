@@ -64,16 +64,16 @@ const isAuth = async (
 
 export default isAuth;
 
-export const isSeller = (
+export const isRider = (
   req: AuthenticatedRequest,
   res: Response,
   next: NextFunction,
 ) => {
   const user = req.user;
 
-  if (user && user.role === "seller") {
+  if (user && user.role !== "rider") {
     res.status(403).json({
-      message: "Access Denied - Sellers are not allowed to perform this action",
+      message: "Access Denied -  Non Riders are not allowed to perform this action",
     });
     return;
   }
