@@ -11,3 +11,5 @@ const TryCatch = (handler: RequestHandler): RequestHandler => {
     }
   };
 };
+
+export default TryCatch;
