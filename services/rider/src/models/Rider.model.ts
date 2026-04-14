@@ -31,7 +31,6 @@ const RiderSchema = new Schema<IRider>(
     phone: {
       type: String,
       required: true,
-      unique: true,
       trim: true,
     },
     adharNumber: {
@@ -41,7 +40,6 @@ const RiderSchema = new Schema<IRider>(
     drivingLicenseNumber: {
       type: String,
       required: true,
-
     },
     isVerified: {
       type: Boolean,
@@ -51,7 +49,7 @@ const RiderSchema = new Schema<IRider>(
       type: {
         type: String,
         enum: ["Point"],
-        default: "Point"
+        default: "Point",
       },
       coordinates: {
         type: [Number],

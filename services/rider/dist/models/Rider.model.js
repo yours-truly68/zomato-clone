@@ -12,7 +12,6 @@ const RiderSchema = new Schema({
     phone: {
         type: String,
         required: true,
-        unique: true,
         trim: true,
     },
     adharNumber: {
@@ -31,7 +30,7 @@ const RiderSchema = new Schema({
         type: {
             type: String,
             enum: ["Point"],
-            default: "Point"
+            default: "Point",
         },
         coordinates: {
             type: [Number],
