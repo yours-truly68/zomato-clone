@@ -95,3 +95,65 @@ export const addRiderProfile = TryCatch(async (req, res) => {
         .status(201)
         .json({ message: "Rider profile created successfully", rider });
 });
+export const getRiderProfile = TryCatch(async (req, res) => {
+    const user = req.user;
+    if (!user) {
+        return res.status(401).json({ message: "Unauthorized - User not found" });
+    }
+    if (user.role !== "rider") {
+        return res
+            .status(403)
+            .json({ message: "Forbidden - Only riders can access their profile" });
+    }
+    const riderAccount = await Rider.findOne({ userId: user._id });
+    if (!riderAccount) {
+        return res.status(404).json({ message: "Rider profile not found" });
+    }
+    res.status(200).json({ rider: riderAccount });
+});
+export const toggleRiderAvailability = TryCatch(async (req, res) => {
+    const user = req.user;
+    if (!user) {
+        return res.status(401).json({ message: "Unauthorized - User not found" });
+    }
+    if (user.role !== "rider") {
+        return res
+            .status(403)
+            .json({ message: "Forbidden - Only riders can toggle availability" });
+    }
+    const { isAvailable, latitude, longitude } = req.body;
+    if (typeof isAvailable !== "boolean") {
+        return res
+            .status(400)
+            .json({ message: "isAvailable must be a boolean value" });
+    }
+    if (latitude === undefined || longitude === undefined) {
+        return res.status(400).json({
+            message: "Latitude and longitude are required to update location",
+        });
+    }
+    const lat = Number(latitude);
+    const lng = Number(longitude);
+    const riderAccount = await Rider.findOne({ userId: user._id });
+    if (!riderAccount) {
+        return res.status(404).json({ message: "Rider profile not found" });
+    }
+    if (isAvailable && !riderAccount.isVerified) {
+        return res.status(400).json({ message: "Rider is not verified" });
+    }
+    // if (!riderAccount.isVerified) {
+    //   return res
+    //     .status(403)
+    //     .json({ message: "Forbidden - Rider profile not verified by admin" });
+    // }
+    riderAccount.isAvailable = isAvailable;
+    riderAccount.location = {
+        type: "Point",
+        coordinates: [lng, lat],
+    };
+    riderAccount.lastActiveAt = new Date();
+    await riderAccount.save();
+    res.status(200).json({
+        message: `Rider is now ${isAvailable ? "available" : "unavailable"}`,
+    });
+});
