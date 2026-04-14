@@ -16,6 +16,50 @@ export const addRiderProfile = TryCatch(
         .json({ message: "Forbidden - Only riders can add profiles" });
     }
 
+    const { phone, adharNumber, drivingLicenseNumber, latitude, longitude } =
+      req.body;
+
+    if (
+      !phone ||
+      !adharNumber ||
+      !drivingLicenseNumber ||
+      latitude === undefined ||
+      longitude === undefined
+    ) {
+      return res.status(400).json({
+        message:
+          "All fields (phone, Aadhar Number, Driving License Number, latitude, longitude) are required",
+      });
+    }
+
+    // Validate Aadhaar and Driving License formats
+    const aadhaarRegex = /^\d{12}$/;
+    const licenseRegex = /^[A-Z0-9-]{8,20}$/;
+
+    if (!aadhaarRegex.test(adharNumber)) {
+      return res
+        .status(400)
+        .json({ success: false, message: "Invalid Aadhaar number" });
+    }
+
+    if (!licenseRegex.test(drivingLicenseNumber)) {
+      return res
+        .status(400)
+        .json({ success: false, message: "Invalid Driving License number" });
+    }
+
+    // Validate latitude and longitude
+    const lat = Number(latitude);
+    const lng = Number(longitude);
+
+    if (isNaN(lat) || isNaN(lng)) {
+      return res.status(400).json({
+        success: false,
+        message: "Invalid latitude or longitude",
+      });
+    }
+
+    //
     const file = req.file;
 
     if (!file) {
@@ -23,6 +67,19 @@ export const addRiderProfile = TryCatch(
         .status(400)
         .json({ message: "No file uploaded - Rider Image not found!" });
     }
+
+    if (!file.mimetype.startsWith("image/")) {
+      return res.status(400).json({
+        message: "Only image files are allowed",
+      });
+    }
+
+    // Check if rider profile already exists for this user
+    const existingRider = await Rider.findOne({ userId: user._id });
+    if (existingRider) {
+      return res.status(400).json({ message: "Rider profile already exists" });
+    }
+    // Validate latitude and longitude ranges
 
     const fileBuffer = getBuffer(file);
 
@@ -34,36 +91,17 @@ export const addRiderProfile = TryCatch(
 
     let imageUrl = "";
 
-    const { data: uploadResult } = await axios.post(
-      `${process.env.UTILS_URL}/api/upload`,
-      {
-        buffer: fileBuffer.content,
-      },
-    );
+    try {
+      const { data: uploadResult } = await axios.post(
+        `${process.env.UTILS_URL}/api/upload`,
+        { buffer: fileBuffer.content },
+      );
 
-    imageUrl = uploadResult.url;
-
-    const { phone, adharNumber, drivingLicenseNumber, latitude, longitude } =
-      req.body;
-
-    if (
-      !phone ||
-      !adharNumber ||
-      !drivingLicenseNumber ||
-      !latitude ||
-      !longitude
-    ) {
-      return res.status(400).json({
-        message:
-          "All fields (phone, Aadhar Number, Driving License Number, latitude, longitude) are required",
+      imageUrl = uploadResult.url;
+    } catch (error) {
+      return res.status(502).json({
+        message: "Image upload failed",
       });
-    }
-
-    // Check if rider profile already exists
-
-    const existingRider = await Rider.findOne({ userId: user._id });
-    if (existingRider) {
-      return res.status(400).json({ message: "Rider profile already exists" });
     }
 
     const rider = await Rider.create({
@@ -74,7 +112,7 @@ export const addRiderProfile = TryCatch(
       drivingLicenseNumber,
       location: {
         type: "Point",
-        coordinates: [Number(longitude), Number(latitude)],
+        coordinates: [lng, lat], // GeoJSON format is [longitude, latitude]
       },
       isVerified: false,
       isAvailable: false, // starts as unavailable until verified by admin
