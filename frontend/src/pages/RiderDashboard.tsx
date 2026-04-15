@@ -3,7 +3,7 @@ import { useAppData } from "../context/AppContext";
 import { useSocket } from "../context/SocketContext";
 import axios from "axios";
 import { riderService } from "../main";
-import { toast } from "react-hot-toast/headless";
+import { toast } from "react-hot-toast";
 import { BiUpload } from "react-icons/bi";
 
 interface IRider {
@@ -34,7 +34,7 @@ const RiderDashboard = () => {
       return;
     }
 
-    setToggle((prev) => !prev);
+    setToggle((prev) => !prev); // Disable the button immediately while we fetch location and submit data
     const token = localStorage.getItem("token");
     if (!token) {
       console.error("No auth token found. Please log in.");
@@ -106,24 +106,26 @@ const RiderDashboard = () => {
   }, [user]);
 
   const toggleAvailability = async () => {
-    if (!navigator.geolocation) {
-      alert("Enable location services to toggle availability");
-      return;
-    }
+    if (!navigator.geolocation) return;
 
-    setToggle((prev) => !prev);
     const token = localStorage.getItem("token");
-    if (!token) {
-      console.error("No auth token found. Please log in.");
-      return;
-    }
+    if (!token) return;
+
+    const newStatus = !riderProfile?.isAvailable;
+
+    // ✅ IMMEDIATE UI UPDATE
+    setRiderProfile((prev) =>
+      prev ? { ...prev, isAvailable: newStatus } : prev,
+    );
+
+    setToggle(true);
 
     navigator.geolocation.getCurrentPosition(async (pos) => {
       try {
         await axios.patch(
           `${riderService}/api/rider/toggle-availability`,
           {
-            isAvailable: !riderProfile?.isAvailable,
+            isAvailable: newStatus,
             latitude: pos.coords.latitude,
             longitude: pos.coords.longitude,
           },
@@ -134,21 +136,24 @@ const RiderDashboard = () => {
           },
         );
 
-        toast.success(
-          `You are now ${!riderProfile?.isAvailable ? "available" : "unavailable"}`,
-        );
-        // After toggling availability, fetch the updated profile to reflect changes
-        fetchProfile();
+        toast.success(`You are now ${newStatus ? "available" : "unavailable"}`);
+        fetchProfile(); // Refresh profile to get latest status from server
       } catch (error) {
-        console.log("Error getting location:", error);
-        toast.error("Failed to toggle availability. Please try again.");
+        // ❌ rollback if failed
+        setRiderProfile((prev) =>
+          prev ? { ...prev, isAvailable: !newStatus } : prev,
+        );
+        console.error("Error toggling availability:", error);
+
+        toast.error("Failed to toggle availability");
+      } finally {
+        setToggle(false);
       }
     });
   };
-
   if (user?.role !== "rider") {
     return (
-      <div className="flex min-h-[65vh] justify-center items-center text-gray-600 text-2xl">
+      <div className="flex min-h-[65vh] justify-center items-center text-gray-500">
         Access Denied - You are not a registered rider.
       </div>
     );
@@ -156,7 +161,7 @@ const RiderDashboard = () => {
 
   if (loading) {
     return (
-      <div className="flex min-h-[65vh] justify-center items-center text-gray-600 text-2xl">
+      <div className="flex min-h-[65vh] justify-center items-center text-gray-500">
         Loading Rider Details...
       </div>
     );
@@ -234,7 +239,7 @@ const RiderDashboard = () => {
             onClick={handleSubmit}
             disabled={submitting}
           >
-            {submitting ? "Adding..." : "Add Restaurant"}
+            {submitting ? "Adding..." : "Add Rider"}
           </button>
         </div>
       </div>
@@ -242,8 +247,54 @@ const RiderDashboard = () => {
   }
 
   return (
-    <div className="flex min-h-[65vh] justify-center items-center text-gray-600 text-2xl">
-      Rider Dashboard goes here...
+    <div className="space-y-4 bg-gray-50 min-h-screen py-6">
+      <div className="mx-auto max-w-md px-4 py-4 ">
+        <div className="bg-white p-4 space-y-3 rounded-lg shadow">
+          <img
+            src={riderProfile.picture}
+            alt="Rider Profile Picture"
+            className="rounded-full h-24 w-24 object-cover mx-auto"
+          />
+          <p className="text-center font-medium text-gray-700">
+            {user?.name || "Rider Name: Not Available"}
+          </p>
+          <p className="text-center text-sm text-gray-500 mt-2">
+            {riderProfile.phone || "Phone: Not Available"}
+          </p>
+
+          <div className="flex justify-center gap-2">
+            <span
+              className={`px-4 py-1 text-xs rounded-full ${riderProfile.isVerified ? "bg-green-100 text-green-600" : "bg-yellow-100 text-yellow-600 shadow shadow-gray-300/50"}`}
+            >
+              {riderProfile.isVerified ? "Verified" : "Pending Verification"}
+            </span>
+            <span
+              className={`px-4 py-1 text-xs rounded-full ${riderProfile.isAvailable ? "bg-green-100 text-green-600" : "bg-yellow-100 text-yellow-600 shadow shadow-gray-300/50"}`}
+            >
+              {riderProfile.isAvailable ? "Online" : "Offline"}
+            </span>
+          </div>
+          <div className="bg-blue-50 rounded-lg p-3 mt-4">
+            <p className="text-blue-400 text-sm text-center">
+              Please be within 500m of any restaurant (which we call the
+              hotspot) before going online as rider to receive orders
+            </p>
+          </div>
+          {riderProfile.isVerified && (
+            <button
+              className={`w-full rounded-lg py-2 text-sm ${toggle ? "bg-gray-500 hover:bg-gray-500" : !riderProfile.isAvailable ? "bg-green-600 hover:bg-green-700" : "bg-[#e23744] hover:bg-[#d12f3a]"} text-white`}
+              onClick={toggleAvailability}
+              disabled={toggle}
+            >
+              {toggle
+                ? "Updating..."
+                : riderProfile.isAvailable
+                  ? "Go Offline"
+                  : "Go Online"}
+            </button>
+          )}
+        </div>
+      </div>
     </div>
   );
 };
