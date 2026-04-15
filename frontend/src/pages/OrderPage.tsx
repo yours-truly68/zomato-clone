@@ -90,7 +90,7 @@ const OrderPage = () => {
   }
 
   return (
-    <div className="mx-auto max-w-3xl px-4 py-6 space-y-6">
+    <div className="mx-auto max-w-4xl px-4 py-6 space-y-4">
       <div className="flex justify-between items-center">
         <h2 className="font-semibold text-xl">Order #{order._id.slice(-6)}</h2>
         <div className="rounded-lg bg-blue-100 text-sm p-4 font-medium">
@@ -150,9 +150,7 @@ const OrderPage = () => {
         </div>
         <div className="flex justify-between text-sm text-gray-600">
           <span>Payment Status: </span>
-          <span className="capitalize ">
-            {order.paymentStatus}
-          </span>
+          <span className="capitalize ">{order.paymentStatus}</span>
         </div>
         <hr className="border border-gray-200" />
         <div className="flex justify-between text-lg font-bold">

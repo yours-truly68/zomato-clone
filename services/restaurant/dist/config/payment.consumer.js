@@ -19,7 +19,8 @@ export const startPaymentConsumer = async () => {
             const { orderId } = event.data;
             const order = await Order.findOneAndUpdate({
                 _id: orderId,
-                paymentStatus: { $ne: "paid" },
+                paymentStatus: { $ne: "paid" }, //double check to avoid processing already paid orders
+                //also Idempotency check in case of message re-deliverty 
             }, {
                 $set: {
                     paymentStatus: "paid",
@@ -52,6 +53,7 @@ export const startPaymentConsumer = async () => {
             channel.ack(msg);
         }
         catch (error) {
+            channel.nack(msg, false, false); // ❗ discard message
             console.error("🐇 Error occurred while consuming payment messages:\n", error);
         }
     });
