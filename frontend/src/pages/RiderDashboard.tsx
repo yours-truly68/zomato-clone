@@ -4,17 +4,16 @@ import { useSocket } from "../context/SocketContext";
 import axios from "axios";
 import { riderService } from "../main";
 import { toast } from "react-hot-toast";
-import { BiUpload } from "react-icons/bi";
+import RiderProfile from "../components/RiderProfile";
+import AddRider from "../components/AddRider";
+import type { IRider } from "../types";
 
-interface IRider {
-  _id: string;
-  phone: string;
-  adharNumber: string;
-  drivingLicenseNumber: string;
-  picture: string;
-  isAvailable: boolean;
-  isVerified: boolean;
-}
+// interface RiderProfileProps {
+//   riderProfile: IRider;
+//   userName: string;
+//   toggle: boolean;
+//   onToggle: () => void;
+// }
 
 const RiderDashboard = () => {
   const { user } = useAppData();
@@ -22,9 +21,9 @@ const RiderDashboard = () => {
   const [riderProfile, setRiderProfile] = useState<IRider | null>(null);
   const [loading, setLoading] = useState(true);
   const [toggle, setToggle] = useState(false);
-  const [phoneNumber, setPhoneNumber] = useState("");
-  const [adharNumber, setAdharNumber] = useState("");
-  const [drivingLicenseNumber, setDrivingLicenseNumber] = useState("");
+  const [phoneNumber, setPhoneNumber] = useState<string>("");
+  const [adharNumber, setAdharNumber] = useState<string>("");
+  const [drivingLicenseNumber, setDrivingLicenseNumber] = useState<string>("");
   const [image, setImage] = useState<File | null>(null);
   const [submitting, setSubmitting] = useState(false);
 
@@ -34,7 +33,7 @@ const RiderDashboard = () => {
       return;
     }
 
-    setToggle((prev) => !prev); // Disable the button immediately while we fetch location and submit data
+    // setToggle((prev) => !prev); // Disable the button immediately while we fetch location and submit data
     const token = localStorage.getItem("token");
     if (!token) {
       console.error("No auth token found. Please log in.");
@@ -105,6 +104,20 @@ const RiderDashboard = () => {
     }
   }, [user]);
 
+  // Listen for real-time updates to rider profile (e.g., order status changes)
+  useEffect(() => {
+    if (!socket) return;
+
+    const handleProfileUpdate = (updatedRider: IRider) => {
+      setRiderProfile(updatedRider);
+    };
+
+    socket.on("orderStatusUpdated", handleProfileUpdate);
+
+    return () => {
+      socket.off("orderStatusUpdated", handleProfileUpdate);
+    };
+  }, [socket]);
   const toggleAvailability = async () => {
     if (!navigator.geolocation) return;
 
@@ -114,7 +127,7 @@ const RiderDashboard = () => {
     const newStatus = !riderProfile?.isAvailable;
 
     // ✅ IMMEDIATE UI UPDATE
-    setRiderProfile((prev) =>
+    setRiderProfile((prev: IRider | null) =>
       prev ? { ...prev, isAvailable: newStatus } : prev,
     );
 
@@ -140,7 +153,7 @@ const RiderDashboard = () => {
         fetchProfile(); // Refresh profile to get latest status from server
       } catch (error) {
         // ❌ rollback if failed
-        setRiderProfile((prev) =>
+        setRiderProfile((prev: IRider | null) =>
           prev ? { ...prev, isAvailable: !newStatus } : prev,
         );
         console.error("Error toggling availability:", error);
@@ -151,6 +164,7 @@ const RiderDashboard = () => {
       }
     });
   };
+
   if (user?.role !== "rider") {
     return (
       <div className="flex min-h-[65vh] justify-center items-center text-gray-500">
@@ -169,133 +183,28 @@ const RiderDashboard = () => {
 
   if (!riderProfile) {
     return (
-      <div className="flex items-center justify-center min-h-screen bg-gray-50 px-4 py-6">
-        <div className="mx-auto max-w-lg rounded-xl bg-white p-6 shadow-sm space-y-5">
-          <h1 className="text-xl font-semibold text-center">
-            Add your Profile
-          </h1>
-
-          <input
-            type="number"
-            placeholder="Aadhar Number..."
-            className="w-full rounded-lg border px-4 py-3 text-sm outline-none border-gray-200"
-            value={adharNumber}
-            onChange={(e) => setAdharNumber(e.target.value)}
-          />
-
-          <input
-            type="text"
-            placeholder="Driving License Number..."
-            className="w-full rounded-lg border px-4 py-3 text-sm outline-none border-gray-200"
-            value={drivingLicenseNumber}
-            onChange={(e) => setDrivingLicenseNumber(e.target.value)}
-          />
-
-          <input
-            type="tel"
-            placeholder="Contact Number..."
-            className="w-full rounded-lg border px-4 py-3 text-sm outline-none border-gray-200"
-            value={phoneNumber}
-            onChange={(e) => setPhoneNumber(e.target.value)}
-          />
-
-          {/* <textarea
-            placeholder="Description..."
-            className="w-full rounded-lg border px-4 py-3 text-sm outline-none border-gray-200"
-            value={description}
-            onChange={(e) => setDescription(e.target.value)}
-          /> */}
-
-          <label className="cursor-pointer flex items-center gap-3 rounded-lg border border-gray-200 px-4 py-3 text-sm text-gray-500 hover:bg-gray-100">
-            <BiUpload className="h-5 w-5 text-red-500" />
-            {image ? image.name : "Upload Rider Image"}
-            <input
-              type="file"
-              accept="image/*"
-              onChange={(e) =>
-                setImage(e.target.files ? e.target.files[0] : null)
-              }
-              hidden
-            />
-          </label>
-
-          {/* <div className="flex items-start gap-3 rounded-lg border border-gray-200 p-4">
-            <BiMapPin className="mt-0.5 h-5 w-5 text-red-500" />
-            <div className="text-sm">
-              {loadingLocation ? (
-                <p className="text-gray-500">Fetching location...</p>
-              ) : location ? (
-                <p className="text-gray-700">
-                  {location.formattedAddress || "Address not available"}
-                </p>
-              ) : (
-                <p className="text-gray-500">Location not found</p>
-              )}
-            </div>
-          </div> */}
-
-          <button
-            className="w-full rounded-lg py-3 text-sm font-semibold text-white bg-[#e23744] disabled:opacity-50"
-            onClick={handleSubmit}
-            disabled={submitting}
-          >
-            {submitting ? "Adding..." : "Add Rider"}
-          </button>
-        </div>
-      </div>
+      <AddRider
+        adharNumber={adharNumber}
+        drivingLicenseNumber={drivingLicenseNumber}
+        phoneNumber={phoneNumber}
+        image={image}
+        setAdharNumber={setAdharNumber}
+        setDrivingLicenseNumber={setDrivingLicenseNumber}
+        setPhoneNumber={setPhoneNumber}
+        setImage={setImage}
+        handleSubmit={handleSubmit}
+        submitting={submitting}
+      />
     );
   }
 
   return (
-    <div className="space-y-4 bg-gray-50 min-h-screen py-6">
-      <div className="mx-auto max-w-md px-4 py-4 ">
-        <div className="bg-white p-4 space-y-3 rounded-lg shadow">
-          <img
-            src={riderProfile.picture}
-            alt="Rider Profile Picture"
-            className="rounded-full h-24 w-24 object-cover mx-auto"
-          />
-          <p className="text-center font-medium text-gray-700">
-            {user?.name || "Rider Name: Not Available"}
-          </p>
-          <p className="text-center text-sm text-gray-500 mt-2">
-            {riderProfile.phone || "Phone: Not Available"}
-          </p>
-
-          <div className="flex justify-center gap-2">
-            <span
-              className={`px-4 py-1 text-xs rounded-full ${riderProfile.isVerified ? "bg-green-100 text-green-600" : "bg-yellow-100 text-yellow-600 shadow shadow-gray-300/50"}`}
-            >
-              {riderProfile.isVerified ? "Verified" : "Pending Verification"}
-            </span>
-            <span
-              className={`px-4 py-1 text-xs rounded-full ${riderProfile.isAvailable ? "bg-green-100 text-green-600" : "bg-yellow-100 text-yellow-600 shadow shadow-gray-300/50"}`}
-            >
-              {riderProfile.isAvailable ? "Online" : "Offline"}
-            </span>
-          </div>
-          <div className="bg-blue-50 rounded-lg p-3 mt-4">
-            <p className="text-blue-400 text-sm text-center">
-              Please be within 500m of any restaurant (which we call the
-              hotspot) before going online as rider to receive orders
-            </p>
-          </div>
-          {riderProfile.isVerified && (
-            <button
-              className={`w-full rounded-lg py-2 text-sm ${toggle ? "bg-gray-500 hover:bg-gray-500" : !riderProfile.isAvailable ? "bg-green-600 hover:bg-green-700" : "bg-[#e23744] hover:bg-[#d12f3a]"} text-white`}
-              onClick={toggleAvailability}
-              disabled={toggle}
-            >
-              {toggle
-                ? "Updating..."
-                : riderProfile.isAvailable
-                  ? "Go Offline"
-                  : "Go Online"}
-            </button>
-          )}
-        </div>
-      </div>
-    </div>
+    <RiderProfile
+      riderProfile={riderProfile}
+      userName={user?.name || "Rider Name: Not Available"}
+      toggle={toggle}
+      onToggle={toggleAvailability}
+    />
   );
 };
 
