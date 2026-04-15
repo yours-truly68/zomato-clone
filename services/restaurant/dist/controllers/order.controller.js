@@ -320,3 +320,168 @@ export const getSingleOrder = TryCatch(async (req, res) => {
         order,
     });
 });
+export const assignOrderToRider = TryCatch(async (req, res) => {
+    const user = req.user;
+    if (!user) {
+        return res.status(401).json({ message: "Unauthorized - User not found" });
+    }
+    if (user.role !== "rider") {
+        return res
+            .status(403)
+            .json({ message: "Forbidden: Only riders can access this endpoint" });
+    }
+    const { orderId, riderId, riderName, riderPhone } = req.body; // Assuming riderId is sent in the request body
+    if (!orderId || !riderId || !riderName || !riderPhone) {
+        return res.status(400).json({
+            message: "Order ID, Rider ID, Rider Name and Rider Phone are required",
+        });
+    }
+    const order = await Order.findById(orderId);
+    if (!order) {
+        return res.status(404).json({ message: "Order not found" });
+    }
+    if (order.riderId !== null) {
+        return res
+            .status(400)
+            .json({ message: "Order is already assigned to a rider" });
+    }
+    const orderUpdated = await Order.findByIdAndUpdate({ _id: orderId, riderId: null }, {
+        riderId,
+        riderName,
+        riderPhone,
+        status: "rider_assigned", //rider assigned status to indicate that the order is now with the rider
+    }, {
+        new: true,
+    });
+    if (!orderUpdated) {
+        return res.status(400).json({
+            message: "Failed to assign order to rider. Please try again.",
+        });
+    }
+    await Promise.allSettled([
+        axios.post(`${process.env.REALTIME_URL}/api/v1/internal/emit`, {
+            event: "order:rider_assigned",
+            room: `user:${orderUpdated.userId}`,
+            payload: orderUpdated,
+        }, {
+            headers: {
+                "x-internal-key": process.env.INTERNAL_SERVICE_KEY,
+            },
+        }),
+        axios.post(`${process.env.REALTIME_URL}/api/v1/internal/emit`, {
+            event: "order:rider_assigned",
+            room: `restaurant:${orderUpdated.restaurantId}`,
+            payload: orderUpdated,
+        }, {
+            headers: {
+                "x-internal-key": process.env.INTERNAL_SERVICE_KEY,
+            },
+        }),
+    ]);
+    res.json({
+        success: true,
+        message: "Order assigned to rider successfully",
+        order: orderUpdated,
+    });
+});
+export const getCurrentOrdersForRider = TryCatch(async (req, res) => {
+    if (req.headers["x-internal-key"] !== process.env.INTERNAL_SERVICE_KEY) {
+        return res
+            .status(403)
+            .json({ message: "Forbidden - Invalid internal key" });
+    }
+    const { riderId } = req.params;
+    if (!riderId) {
+        return res.status(400).json({ message: "Rider ID is required" });
+    }
+    const orders = await Order.findOne({
+        riderId,
+        status: {
+            $ne: "delivered",
+        },
+    }).populate("restaurantId");
+    if (!orders) {
+        return res
+            .status(404)
+            .json({ message: "No current orders found for this rider" });
+    }
+    res.json(orders);
+});
+export const updateOrderStatusByRider = TryCatch(async (req, res) => {
+    if (req.headers["x-internal-key"] !== process.env.INTERNAL_SERVICE_KEY) {
+        return res
+            .status(403)
+            .json({ message: "Forbidden - Invalid internal key" });
+    }
+    const { orderId } = req.body;
+    if (!orderId) {
+        return res.status(400).json({ message: "Order ID is required" });
+    }
+    const order = await Order.findById(orderId);
+    if (!order) {
+        return res.status(404).json({ message: "Order not found" });
+    }
+    if (order.status === "rider_assigned") {
+        order.status = "out_for_delivery";
+        await order.save({ validateBeforeSave: false });
+        await Promise.allSettled([
+            axios.post(`${process.env.REALTIME_URL}/api/v1/internal/emit`, {
+                event: "order:rider_assigned",
+                room: `user:${order.userId}`,
+                payload: order,
+            }, {
+                headers: {
+                    "x-internal-key": process.env.INTERNAL_SERVICE_KEY,
+                },
+            }),
+            axios.post(`${process.env.REALTIME_URL}/api/v1/internal/emit`, {
+                event: "order:rider_assigned",
+                room: `restaurant:${order.restaurantId}`,
+                payload: order,
+            }, {
+                headers: {
+                    "x-internal-key": process.env.INTERNAL_SERVICE_KEY,
+                },
+            }),
+        ]);
+        return res.json({
+            success: true,
+            message: "Order status updated to out for delivery",
+            order,
+        });
+    }
+    if (order.status === "out_for_delivery") {
+        order.status = "delivered";
+        await order.save({ validateBeforeSave: false });
+        await Promise.allSettled([
+            axios.post(`${process.env.REALTIME_URL}/api/v1/internal/emit`, {
+                event: "order:rider_assigned",
+                room: `user:${order.userId}`,
+                payload: order,
+            }, {
+                headers: {
+                    "x-internal-key": process.env.INTERNAL_SERVICE_KEY,
+                },
+            }),
+            axios.post(`${process.env.REALTIME_URL}/api/v1/internal/emit`, {
+                event: "order:rider_assigned",
+                room: `restaurant:${order.restaurantId}`,
+                payload: order,
+            }, {
+                headers: {
+                    "x-internal-key": process.env.INTERNAL_SERVICE_KEY,
+                },
+            }),
+        ]);
+        return res.json({
+            success: true,
+            message: "Order status updated to delivered",
+            order,
+        });
+    }
+    res.json({
+        success: true,
+        message: "Order status updated successfully",
+        order,
+    });
+});
