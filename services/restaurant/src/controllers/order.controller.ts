@@ -7,6 +7,7 @@ import { IMenuItem } from "../models/MenuItems.model.js";
 import Order from "../models/Orders.model.js";
 import Restaurant, { IRestaurant } from "../models/Restaurant.model.js";
 import jwt from "jsonwebtoken";
+import { publishOrderCreated } from "../config/order.publisher.js";
 
 export const createOrder = TryCatch(async (req: AuthenticatedRequest, res) => {
   const user = req.user;
@@ -339,7 +340,6 @@ export const updateOrderStatus = TryCatch(
     order.status = status;
     await order.save({ validateBeforeSave: false });
 
-
     axios.post(
       `${process.env.REALTIME_URL}/api/v1/internal/emit`,
       {
@@ -359,6 +359,24 @@ export const updateOrderStatus = TryCatch(
 
     // Emit real-time update to the user about order status change (not implemented here)
     // You can use WebSockets or a service like Pusher to notify the user in real-time
+
+    //now assign to rider if status is ready for pickup
+    if (status === "ready_for_pickup") {
+      // Logic to assign order to rider goes here (not implemented here)
+      // You can find an available rider and update the order with the rider's ID
+      console.log(
+        `Order ${order._id} is ready for pickup. Assigning to rider...`,
+      );
+      await publishOrderCreated("ORDER_READY_FOR_PICKUP", {
+        orderId: order._id.toString(),
+        restaurantId: restaurant._id.toString(),
+        location: restaurant.autoLocation,
+      });
+
+      console.log(
+        `Published order ready for pickup event for order ${order._id} to RabbitMQ`,
+      ); // Debug log
+    }
 
     res.json({ message: "Order status updated successfully", order });
   },
