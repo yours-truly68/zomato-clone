@@ -367,6 +367,7 @@ export const updateOrderStatus = TryCatch(
       console.log(
         `Order ${order._id} is ready for pickup. Assigning to rider...`,
       );
+      
       await publishOrderCreated("ORDER_READY_FOR_PICKUP", {
         orderId: order._id.toString(),
         restaurantId: restaurant._id.toString(),
