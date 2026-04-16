@@ -436,16 +436,10 @@ export const getSingleOrder = TryCatch(
 
 export const assignOrderToRider = TryCatch(
   async (req: AuthenticatedRequest, res) => {
-    const user = req.user;
-
-    if (!user) {
-      return res.status(401).json({ message: "Unauthorized - User not found" });
-    }
-
-    if (user.role !== "rider") {
-      return res
-        .status(403)
-        .json({ message: "Forbidden: Only riders can access this endpoint" });
+    if (req.headers["x-internal-key"] !== process.env.INTERNAL_SERVICE_KEY) {
+      return res.status(403).json({
+        message: "Forbidden - Invalid internal key",
+      });
     }
 
     const { orderId, riderId, riderName, riderPhone } = req.body; // Assuming riderId is sent in the request body
