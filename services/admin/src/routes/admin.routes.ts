@@ -16,7 +16,7 @@ adminRoutes.get(
   getPendingRestaurants,
 );
 
-adminRoutes.get("/admin/rider/pending", isAuth, isAdmin, getPendingRiders);
+adminRoutes.get("/rider/pending", isAuth, isAdmin, getPendingRiders);
 
 adminRoutes.patch("/verify/restaurant/:id", isAuth, isAdmin, verifyRestaurant);
 adminRoutes.patch("/verify/rider/:id", isAuth, isAdmin, verifyRider);
