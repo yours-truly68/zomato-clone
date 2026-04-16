@@ -11,6 +11,7 @@ import audio from "../assets/faah_notification.mp3";
 import RiderOrderRequest from "../components/RiderOrderRequest";
 import RiderCurrentOrder from "../components/RiderCurrentOrder";
 import RiderOrderMap from "../components/RiderOrderMap";
+import { useNavigate } from "react-router-dom";
 
 // interface RiderProfileProps {
 //   riderProfile: IRider;
@@ -34,6 +35,12 @@ const RiderDashboard = () => {
   const [currentOrder, setCurrentOrder] = useState<IOrder | null>(null); // To track the order currently being delivered
   const [audioUnlocked, setAudioUnlocked] = useState(false);
   const audioRef = useRef<HTMLAudioElement | null>(null); // For real-time incoming order notifications
+  // const navigate = useNavigate();
+
+  // const logoutHandler = () => {
+  //   localStorage.removeItem("token");
+  //   navigate("/login");
+  // };
 
   useEffect(() => {
     audioRef.current = new Audio(audio);
@@ -274,6 +281,7 @@ const RiderDashboard = () => {
         toggle={toggle}
         onToggle={toggleAvailability}
         currentOrder={currentOrder}
+        // logoutHandler={logoutHandler}
       />
       {!audioUnlocked && (
         <div className="flex justify-between items-center bg-blue-50 border border-blue-200 p-4 rounded-lg ">

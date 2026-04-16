@@ -9,12 +9,7 @@ import {
 
 const adminRoutes = Router();
 
-adminRoutes.get(
-  "/admin/restaurant/pending",
-  isAuth,
-  isAdmin,
-  getPendingRestaurants,
-);
+adminRoutes.get("/restaurant/pending", isAuth, isAdmin, getPendingRestaurants);
 
 adminRoutes.get("/rider/pending", isAuth, isAdmin, getPendingRiders);
 

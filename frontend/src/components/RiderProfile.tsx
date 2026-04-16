@@ -6,6 +6,7 @@ interface RiderProfileProps {
   toggle: boolean;
   currentOrder: IOrder | null;
   onToggle: () => void;
+  // logoutHandler: () => void;
 }
 
 const RiderProfile = ({
@@ -14,6 +15,7 @@ const RiderProfile = ({
   toggle,
   onToggle,
   currentOrder,
+  // logoutHandler,
 }: RiderProfileProps) => {
   return (
     <div className="space-y-4 bg-gray-50 py-6">
@@ -51,7 +53,7 @@ const RiderProfile = ({
           </div>
           {riderProfile.isVerified && !currentOrder && (
             <button
-              className={`w-full rounded-lg py-2 text-sm ${toggle ? "bg-gray-500 hover:bg-gray-500" : !riderProfile.isAvailable ? "bg-green-600 hover:bg-green-700" : "bg-[#e23744] hover:bg-[#d12f3a]"} text-white`}
+              className={`w-full rounded-lg py-2 text-sm ${toggle ? "bg-gray-500 hover:bg-gray-600" : !riderProfile.isAvailable ? "bg-green-600 hover:bg-green-700" : "bg-[#e23744] hover:bg-[#d12f3a]"} text-white`}
               onClick={onToggle}
               disabled={toggle}
             >
@@ -63,6 +65,14 @@ const RiderProfile = ({
             </button>
           )}
         </div>
+      </div>
+      <div className="flex justify-center mt-4">
+        {/* <button
+          onClick={logoutHandler}
+          className="px-4 py-2 bg-red-600 text-white text-sm rounded-md hover:bg-red-700 transition"
+        >
+          Logout
+        </button> */}
       </div>
     </div>
   );
