@@ -6,17 +6,25 @@ const PublicRoute = () => {
 
   if (loading) return null;
 
-  if (!isAuth) return <Outlet />;
+  // 🔴 If NOT authenticated → allow public pages
+  if (!isAuth) {
+    return <Outlet />;
+  }
 
-  if (!user) return <Navigate to="/login" replace />;
-  // 🔥 Role-based redirect
+  // 🔴 If authenticated but user not loaded yet → wait
+  if (!user) {
+    return null;
+  }
+
+  // 🔥 Redirect logged-in users away from public pages
   if (user.role === "seller") {
     return <Navigate to="/seller" replace />;
-  } else if (user.role === "rider") {
+  }
+
+  if (user.role === "rider") {
     return <Navigate to="/rider/dashboard" replace />;
   }
 
   return <Navigate to="/" replace />;
 };
-
 export default PublicRoute;

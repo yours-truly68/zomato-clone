@@ -19,51 +19,46 @@ import RiderDashboard from "./pages/RiderDashboard";
 import Admin from "./pages/Admin";
 
 const App = () => {
-  const { user, loading } = useAppData();
+  const { loading } = useAppData();
 
-  if (loading)
+  if (loading) {
     return (
       <div className="text-2xl font-bold flex justify-center items-center min-h-screen text-blue-600">
         Loading...
       </div>
     );
-
-  if (user && user.role === "rider") {
-    return <RiderDashboard />;
-  }
-  if (user && user.role === "seller") {
-    return <Restaurant />;
-  }
-  if (user && user.role === "admin") {
-    return <Admin />;
   }
 
   return (
-    <>
-      <BrowserRouter>
-        <Navbar />
-        <Routes>
-          <Route element={<PublicRoute />}>
-            <Route path={"/login"} element={<Login />} />
-          </Route>
-          <Route element={<ProtectedRoute />}>
-            <Route path={"/"} element={<Home />} />
-            <Route path={"/orders"} element={<Orders />} />
-            <Route path={"/orders/:id"} element={<OrderPage />} />
-            <Route path={"/restaurant/:id"} element={<RestaurantPage />} />
-            <Route path={"/cart"} element={<Cart />} />
-            <Route path={"/select-role"} element={<SelectRole />} />
-            <Route path={"/account"} element={<Account />} />
-            <Route path={"/address"} element={<Address />} />
-            <Route path={"/checkout"} element={<Checkout />} />
-            <Route
-              path={"/paymentsuccess/:paymentId"}
-              element={<PageSuccess />}
-            />
-          </Route>
-        </Routes>
-      </BrowserRouter>
-    </>
+    <BrowserRouter>
+      <Navbar />
+
+      <Routes>
+        {/* Public */}
+        <Route element={<PublicRoute />}>
+          <Route path="/login" element={<Login />} />
+        </Route>
+
+        {/* Protected */}
+        <Route element={<ProtectedRoute />}>
+          <Route path="/" element={<Home />} />
+          <Route path="/orders" element={<Orders />} />
+          <Route path="/orders/:id" element={<OrderPage />} />
+          <Route path="/restaurant/:id" element={<RestaurantPage />} />
+          <Route path="/cart" element={<Cart />} />
+          <Route path="/select-role" element={<SelectRole />} />
+          <Route path="/account" element={<Account />} />
+          <Route path="/address" element={<Address />} />
+          <Route path="/checkout" element={<Checkout />} />
+          <Route path="/paymentsuccess/:paymentId" element={<PageSuccess />} />
+
+          {/* 🔥 ROLE BASED ROUTES */}
+          <Route path="/rider/dashboard" element={<RiderDashboard />} />
+          <Route path="/seller" element={<Restaurant />} />
+          <Route path="/admin" element={<Admin />} />
+        </Route>
+      </Routes>
+    </BrowserRouter>
   );
 };
 

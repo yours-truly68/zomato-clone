@@ -2,6 +2,7 @@ import { useCallback, useEffect, useState } from "react";
 import type { IRestaurant } from "../types";
 import axios from "axios";
 import { adminService } from "../main";
+import AdminRestaurantCard from "../components/AdminRestaurantCard";
 
 const Admin = () => {
   const [restaurants, setRestaurants] = useState<any[]>([]);
@@ -88,6 +89,38 @@ const Admin = () => {
           Riders
         </button>
       </div>
+      {activeTab === "restaurants" && (
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+          {restaurants.length === 0 ? (
+            <p className="text-gray-500">
+              No pending restaurants for approval.
+            </p>
+          ) : (
+            <div>
+              {restaurants.map((restaurant) => (
+                <AdminRestaurantCard
+                  key={restaurant._id}
+                  restaurant={restaurant}
+                  onVerify={fetchData}
+                />
+              ))}
+            </div>
+          )}
+        </div>
+      )}
+      {activeTab === "riders" && (
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+          {riders.length === 0 ? (
+            <p className="text-gray-500">No pending riders for approval.</p>
+          ) : (
+            <div>
+              {riders.map((rider) => (
+                <p key={rider._id}>{rider._id}</p>
+              ))}
+            </div>
+          )}
+        </div>
+      )}
     </div>
   );
 };
