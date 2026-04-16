@@ -30,6 +30,9 @@ const App = () => {
   if (user && user.role === "rider") {
     return <RiderDashboard />;
   }
+  if (user && user.role === "seller") {
+    return <Restaurant />;
+  }
 
   return (
     <>
@@ -53,8 +56,6 @@ const App = () => {
               path={"/paymentsuccess/:paymentId"}
               element={<PageSuccess />}
             />
-            <Route path={"/seller"} element={<Restaurant />} />
-            {/* <Route path={"/rider"} element={<RiderDashboard />} />   */}
           </Route>
         </Routes>
       </BrowserRouter>
