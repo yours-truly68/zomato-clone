@@ -4,6 +4,7 @@ import toast from "react-hot-toast";
 import axios from "axios";
 import { restaurantService } from "../main";
 import { BiMapPin, BiUpload } from "react-icons/bi";
+import { useNavigate } from "react-router-dom";
 
 interface IAddRestaurantProps {
   fetchMyRestaurant: () => Promise<void>;
@@ -15,6 +16,7 @@ const AddRestaurant = ({ fetchMyRestaurant }: IAddRestaurantProps) => {
   const [phone, setPhone] = useState("");
   const [image, setImage] = useState<File | null>(null);
   const [submitting, setSubmitting] = useState(false);
+  const navigate = useNavigate();
 
   const { loadingLocation, location } = useAppData();
 
@@ -77,6 +79,7 @@ const AddRestaurant = ({ fetchMyRestaurant }: IAddRestaurantProps) => {
       setDescription("");
       setPhone("");
       setImage(null);
+      navigate("/seller"); // ✅ Redirect to seller dashboard
       await fetchMyRestaurant(); // ✅ Fetch updated restaurant list
     } catch (error: any) {
       console.log("Error:", error);
