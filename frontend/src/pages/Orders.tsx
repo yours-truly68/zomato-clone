@@ -71,6 +71,37 @@ const Orders = () => {
     };
   }, [socket]);
 
+  useEffect(() => {
+    if (!socket) return;
+
+    const onUpdateOrder = () => {
+      console.log("🔥 New order received");
+
+      // if (audioRef.current) {
+      //   console.log("🔊 Trying to play audio...");
+
+      //   audioRef.current.currentTime = 0;
+
+      //   audioRef.current
+      //     .play()
+      //     .then(() => {
+      //       console.log("✅ Audio played successfully");
+      //     })
+      //     .catch((err) => {
+      //       console.error("❌ Audio failed:", err);
+      //     });
+      // }
+
+      fetchOrders();
+    };
+
+    socket.on("order:rider_assigned", onUpdateOrder);
+
+    return () => {
+      socket.off("order:rider_assigned", onUpdateOrder);
+    };
+  }, [socket]);
+
   if (loading) {
     return (
       <div className="flex min-h-70vh justify-center items-center text-xl text-gray-500">

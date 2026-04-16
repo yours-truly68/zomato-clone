@@ -74,7 +74,7 @@ const RestaurantOrders = ({ restaurantId }: { restaurantId: string }) => {
   useEffect(() => {
     if (!socket) return;
 
-    const onNewOrder = () => {
+    const onUpdateOrder = () => {
       console.log("🔥 New order received");
 
       if (audioRef.current) {
@@ -94,13 +94,10 @@ const RestaurantOrders = ({ restaurantId }: { restaurantId: string }) => {
 
       fetchOrders();
     };
-    socket.on("order:new", onNewOrder);
-    socket.on("order:new", () => {
-      console.log("🔥 EVENT RECEIVED");
-    });
+    socket.on("order:rider_assigned", onUpdateOrder);
 
     return () => {
-      socket.off("order:new", onNewOrder);
+      socket.off("order:rider_assigned", onUpdateOrder);
     };
   }, [socket]);
 
@@ -157,7 +154,11 @@ const RestaurantOrders = ({ restaurantId }: { restaurantId: string }) => {
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {activeOrders.map((order) => (
-                <OrderCard key={order._id} order={order} onStatusUpdate={fetchOrders} />
+              <OrderCard
+                key={order._id}
+                order={order}
+                onStatusUpdate={fetchOrders}
+              />
             ))}
           </div>
         )}
@@ -169,7 +170,11 @@ const RestaurantOrders = ({ restaurantId }: { restaurantId: string }) => {
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {completedOrders.map((order) => (
-                <OrderCard key={order._id} order={order} onStatusUpdate={fetchOrders} />
+              <OrderCard
+                key={order._id}
+                order={order}
+                onStatusUpdate={fetchOrders}
+              />
             ))}
           </div>
         )}
