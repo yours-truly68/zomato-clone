@@ -17,7 +17,7 @@ const RiderProfile = ({
 }: RiderProfileProps) => {
   return (
     <div className="space-y-4 bg-gray-50 py-6">
-      <div className="mx-auto max-w-md px-4 py-4 ">
+      <div className="mx-auto max-w-3xl py-4 ">
         <div className="bg-white p-4 space-y-3 rounded-lg shadow">
           <img
             src={riderProfile.picture}
