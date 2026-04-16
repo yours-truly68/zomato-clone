@@ -4,9 +4,11 @@ import cors from "cors";
 import connectDB from "./config/db.config.js";
 import riderRoutes from "./routes/rider.routes.js";
 import { connectToRabbitMQ } from "./config/rabbitmq.config.js";
+import { startOrderReadyConsumer } from "./config/orderReady.consumer.js";
 
 dotenv.config();
 await connectToRabbitMQ();
+startOrderReadyConsumer();
 
 const PORT = process.env.PORT || 8005;
 

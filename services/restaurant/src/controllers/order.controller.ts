@@ -532,7 +532,7 @@ export const getCurrentOrdersForRider = TryCatch(
         .json({ message: "Forbidden - Invalid internal key" });
     }
 
-    const { riderId } = req.query;
+    const { riderId } = req.params;
 
     if (!riderId) {
       return res.status(400).json({ message: "Rider ID is required" });
@@ -546,12 +546,10 @@ export const getCurrentOrdersForRider = TryCatch(
     }).populate("restaurantId");
 
     if (!orders) {
-      return res
-        .status(404)
-        .json({ message: "No current orders found for this rider" });
+      return res.json({ order: null });
     }
 
-    res.json(orders);
+    res.json({ order: orders });
   },
 );
 

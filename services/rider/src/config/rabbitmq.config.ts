@@ -9,13 +9,13 @@ export const connectToRabbitMQ = async () => {
     channel = await connection.createChannel();
 
     await channel.assertQueue(process.env.RIDER_QUEUE!, { durable: true });
+    await channel.assertQueue(process.env.ORDER_READY_QUEUE!, {
+      durable: true,
+    });
 
     console.log("🐇 Connected to RabbitMQ: Rider Service");
   } catch (error) {
-    console.error(
-      "🐇 Error connecting to RabbitMQ(rider service):\n",
-      error,
-    );
+    console.error("🐇 Error connecting to RabbitMQ(rider service):\n", error);
   }
 };
 

@@ -229,7 +229,7 @@ export const fetchMyCurrentOrder = TryCatch(async (req, res) => {
             .json({ message: "Rider profile not found or not verified/available" });
     }
     try {
-        const { data } = await axios.get(`${process.env.RESTAURANT_URL}/api/order/current/rider?riderId=${rider._id}`, {
+        const { data } = await axios.get(`${process.env.RESTAURANT_URL}/api/order/rider/current/${rider._id}`, {
             headers: {
                 "x-internal-key": process.env.INTERNAL_SERVICE_KEY,
             },

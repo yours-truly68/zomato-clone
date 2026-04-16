@@ -9,6 +9,11 @@ const isAuth = async (req, res, next) => {
             });
             return;
         }
+        const internalKey = req.headers["x-internal-key"];
+        if (internalKey && internalKey === process.env.INTERNAL_SERVICE_KEY) {
+            return next(); // ✅ allow internal services
+        }
+        // continue JWT validation...
         //verifying the extracted token
         const token = authHeader.split(" ")[1];
         if (!token) {

@@ -298,7 +298,7 @@ export const fetchMyCurrentOrder = TryCatch(
 
     try {
       const { data } = await axios.get(
-        `${process.env.RESTAURANT_URL}/api/order/current/rider?riderId=${rider._id}`,
+        `${process.env.RESTAURANT_URL}/api/order/rider/current/${rider._id}`,
         {
           headers: {
             "x-internal-key": process.env.INTERNAL_SERVICE_KEY,

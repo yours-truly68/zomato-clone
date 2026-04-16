@@ -29,6 +29,13 @@ const isAuth = async (
       });
       return;
     }
+    const internalKey = req.headers["x-internal-key"];
+
+    if (internalKey && internalKey === process.env.INTERNAL_SERVICE_KEY) {
+      return next(); // ✅ allow internal services
+    }
+
+    // continue JWT validation...
 
     //verifying the extracted token
 
@@ -73,7 +80,8 @@ export const isRider = (
 
   if (user && user.role !== "rider") {
     res.status(403).json({
-      message: "Access Denied -  Non Riders are not allowed to perform this action",
+      message:
+        "Access Denied -  Non Riders are not allowed to perform this action",
     });
     return;
   }

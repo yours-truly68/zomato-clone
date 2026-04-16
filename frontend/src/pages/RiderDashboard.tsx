@@ -180,10 +180,8 @@ const RiderDashboard = () => {
   };
 
   useEffect(() => {
-    if (riderProfile) {
-      fetchCurrentOrder();
-    }
-  }, [riderProfile]);
+    fetchCurrentOrder();
+  }, []);
 
   const toggleAvailability = async () => {
     if (!navigator.geolocation) return;
@@ -266,7 +264,7 @@ const RiderDashboard = () => {
   }
 
   return (
-    <div className=" min-h-screen space-y-4 max-w-3xl mx-auto px-4 py-6">
+    <div className=" min-h-screen space-y-4 w-full mx-auto px-4 py-6">
       <RiderProfile
         riderProfile={riderProfile}
         userName={user?.name || "Rider Name: Not Available"}
@@ -295,6 +293,15 @@ const RiderDashboard = () => {
           >
             Enable Audio
           </button>
+        </div>
+      )}
+
+      {riderProfile.isAvailable && incomingOrders.length > 0 && (
+        <div className="mx-auto max-w-md bg-green-50 border border-green-200 px-4 rounded-lg text-center">
+          <h3 className="text-green-600 font-medium">New Order Available!</h3>
+          {incomingOrders.map((orderId) => (
+            <p key={orderId}>Order ID: {orderId}</p>
+          ))}
         </div>
       )}
     </div>

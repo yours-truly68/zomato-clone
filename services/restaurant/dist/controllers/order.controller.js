@@ -390,7 +390,7 @@ export const getCurrentOrdersForRider = TryCatch(async (req, res) => {
             .status(403)
             .json({ message: "Forbidden - Invalid internal key" });
     }
-    const { riderId } = req.query;
+    const { riderId } = req.params;
     if (!riderId) {
         return res.status(400).json({ message: "Rider ID is required" });
     }
@@ -401,11 +401,9 @@ export const getCurrentOrdersForRider = TryCatch(async (req, res) => {
         },
     }).populate("restaurantId");
     if (!orders) {
-        return res
-            .status(404)
-            .json({ message: "No current orders found for this rider" });
+        return res.json({ order: null });
     }
-    res.json(orders);
+    res.json({ order: orders });
 });
 export const updateOrderStatusByRider = TryCatch(async (req, res) => {
     if (req.headers["x-internal-key"] !== process.env.INTERNAL_SERVICE_KEY) {

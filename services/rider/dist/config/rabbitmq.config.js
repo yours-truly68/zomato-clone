@@ -5,6 +5,9 @@ export const connectToRabbitMQ = async () => {
         const connection = await amqlib.connect(process.env.RABBITMQ_URL);
         channel = await connection.createChannel();
         await channel.assertQueue(process.env.RIDER_QUEUE, { durable: true });
+        await channel.assertQueue(process.env.ORDER_READY_QUEUE, {
+            durable: true,
+        });
         console.log("🐇 Connected to RabbitMQ: Rider Service");
     }
     catch (error) {
