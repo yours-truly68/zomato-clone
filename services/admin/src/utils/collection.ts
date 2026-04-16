@@ -1,4 +1,4 @@
-import { connectDB } from "../src/config/db.config.js";
+import { connectDB } from "../config/db.config.js";
 
 export const getRestaurantCollection = async () => {
   const db = await connectDB();
@@ -8,9 +8,4 @@ export const getRestaurantCollection = async () => {
 export const getRiderCollection = async () => {
   const db = await connectDB();
   return db.collection("riders");
-};
-
-export const getUserCollection = async () => {
-  const db = await connectDB();
-  return db.collection("users");
 };
