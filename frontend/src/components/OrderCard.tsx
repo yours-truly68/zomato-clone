@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import type { IOrder } from "../types";
 import { ORDER_ACTIONS } from "../utils/orderflow.utils";
 import toast from "react-hot-toast";
@@ -33,12 +33,27 @@ const statusColor = (status: string) => {
 
 const OrderCard = ({ order, onStatusUpdate }: OrderCardProps) => {
   const [loading, setLoading] = useState(false);
+  const [retryVisible, setRetryVisible] = useState(false);
 
   const actions = ORDER_ACTIONS[order.status] || [];
+
+  useEffect(() => {
+    if (order.status !== "ready_for_pickup") {
+      setRetryVisible(false);
+      return;
+    }
+
+    const timer = setTimeout(() => {
+      setRetryVisible(true);
+    }, 10000); // 10 seconds
+
+    return () => clearTimeout(timer);
+  }, [order.status]);
 
   const updateStatus = async (newStatus: string) => {
     try {
       setLoading(true);
+      setRetryVisible(false);
       const token = localStorage.getItem("token");
       if (!token) {
         throw new Error("Authentication token not found");
@@ -107,6 +122,15 @@ const OrderCard = ({ order, onStatusUpdate }: OrderCardProps) => {
             </button>
           ))}
         </div>
+      )}
+      {order.status === "ready_for_pickup" && retryVisible && (
+        <button
+          className="px-3 py-2 w-full bg-yellow-600 hover:bg-yellow-700 text-white rounded-lg text-xs font-medium disabled:opacity-50 mt-2"
+          onClick={() => updateStatus("ready_for_pickup")}
+          disabled={loading}
+        >
+          Retry Ready for Pickup
+        </button>
       )}
     </div>
   );
