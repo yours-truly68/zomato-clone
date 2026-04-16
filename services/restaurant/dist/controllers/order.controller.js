@@ -390,7 +390,7 @@ export const getCurrentOrdersForRider = TryCatch(async (req, res) => {
             .status(403)
             .json({ message: "Forbidden - Invalid internal key" });
     }
-    const { riderId } = req.params;
+    const { riderId } = req.query;
     if (!riderId) {
         return res.status(400).json({ message: "Rider ID is required" });
     }

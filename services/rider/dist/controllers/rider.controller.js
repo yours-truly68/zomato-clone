@@ -157,3 +157,121 @@ export const toggleRiderAvailability = TryCatch(async (req, res) => {
         message: `Rider is now ${isAvailable ? "available" : "unavailable"}`,
     });
 });
+export const acceptOrderByRider = TryCatch(async (req, res) => {
+    const riderUserId = req.user?._id;
+    const { orderId } = req.params;
+    if (!riderUserId) {
+        return res.status(401).json({ message: "Unauthorized - User not found" });
+    }
+    if (req.user?.role !== "rider") {
+        return res
+            .status(403)
+            .json({ message: "Forbidden - Only riders can accept orders" });
+    }
+    const rider = await Rider.findOne({
+        userId: riderUserId,
+        isAvailable: true,
+        isVerified: true,
+    });
+    if (!rider) {
+        return res.status(404).json({
+            message: "Rider profile not found or not available/verified",
+        });
+    }
+    try {
+        const { data } = await axios.put(`${process.env.RESTAURANT_URL}/api/order/assign/rider`, {
+            orderId,
+            riderId: rider._id,
+            riderUserId: rider.userId,
+            riderPhone: rider.phone,
+            picture: rider.picture,
+        }, {
+            headers: {
+                "x-internal-key": process.env.INTERNAL_SERVICE_KEY,
+            },
+        });
+        if (data.success) {
+            await Rider.findOneAndUpdate({
+                userId: riderUserId,
+                isAvailable: true,
+                isVerified: true,
+            }, { isAvailable: false }, { new: true });
+        }
+        res.status(200).json({
+            message: "Order accepted successfully",
+        });
+    }
+    catch (error) {
+        await Rider.findByIdAndUpdate(rider._id, { isAvailable: true });
+        console.error("Error accepting order:", error);
+        return res.status(500).json({ message: "Failed to accept order" });
+    }
+});
+export const fetchMyCurrentOrder = TryCatch(async (req, res) => {
+    // This function can be implemented to allow riders to fetch their current active order details.
+    // It would involve making a request to the restaurant service to get the order assigned to the rider.
+    const riderUserId = req.user?._id;
+    if (!riderUserId) {
+        return res.status(401).json({ message: "Unauthorized - User not found" });
+    }
+    if (req.user?.role !== "rider") {
+        return res.status(403).json({
+            message: "Forbidden - Only riders can access their current order",
+        });
+    }
+    const rider = await Rider.findOne({
+        userId: riderUserId,
+        isVerified: true,
+        isAvailable: false, // Only fetch current order if rider is currently unavailable (i.e., has an active order)
+    });
+    if (!rider) {
+        return res
+            .status(404)
+            .json({ message: "Rider profile not found or not verified/available" });
+    }
+    try {
+        const { data } = await axios.get(`${process.env.RESTAURANT_URL}/api/order/current/rider?riderId=${rider._id}`, {
+            headers: {
+                "x-internal-key": process.env.INTERNAL_SERVICE_KEY,
+            },
+        });
+        res.status(200).json({ order: data.order });
+    }
+    catch (error) {
+        console.error("Error fetching current order:", error);
+        return res.status(500).json({ message: "Failed to fetch current order" });
+    }
+});
+export const updateOrderStatus = TryCatch(async (req, res) => {
+    const userId = req.user?._id;
+    if (!userId) {
+        return res.status(401).json({ message: "Unauthorized - User not found" });
+    }
+    if (req.user?.role !== "rider") {
+        return res
+            .status(403)
+            .json({ message: "Forbidden - Only riders can update order status" });
+    }
+    const rider = await Rider.findOne({ userId, isVerified: true });
+    if (!rider) {
+        return res.status(404).json({
+            message: "Rider profile not found or not verified",
+        });
+    }
+    const { orderId } = req.params;
+    try {
+        const { data } = await axios.put(`${process.env.RESTAURANT_URL}/api/order/update/rider/status`, {
+            orderId,
+            riderId: rider._id,
+        }, {
+            headers: {
+                "x-internal-key": process.env.INTERNAL_SERVICE_KEY,
+            },
+        });
+        res.status(200).json({ message: "Order status updated successfully" });
+    }
+    catch (error) {
+        console.error("Error updating order status:", error);
+        return res.status(500).json({ message: "Failed to update order status" });
+    }
+});
