@@ -8,6 +8,7 @@ import RiderProfile from "../components/RiderProfile";
 import AddRider from "../components/AddRider";
 import type { IOrder, IRider } from "../types";
 import audio from "../assets/faah_notification.mp3";
+import RiderOrderRequest from "../components/RiderOrderRequest";
 
 // interface RiderProfileProps {
 //   riderProfile: IRider;
@@ -270,6 +271,7 @@ const RiderDashboard = () => {
         userName={user?.name || "Rider Name: Not Available"}
         toggle={toggle}
         onToggle={toggleAvailability}
+        currentOrder={currentOrder}
       />
       {!audioUnlocked && (
         <div className="flex justify-between items-center bg-blue-50 border border-blue-200 p-4 rounded-lg ">
@@ -297,10 +299,19 @@ const RiderDashboard = () => {
       )}
 
       {riderProfile.isAvailable && incomingOrders.length > 0 && (
-        <div className="mx-auto max-w-md bg-green-50 border border-green-200 px-4 rounded-lg text-center">
-          <h3 className="text-green-600 font-medium">New Order Available!</h3>
+        <div className="mx-auto max-w-md px-4 rounded-lg">
+          <h1 className="text-xl font-bold text-gray-800 py-4">
+            Incoming Orders
+          </h1>
           {incomingOrders.map((orderId) => (
-            <p key={orderId}>Order ID: {orderId}</p>
+            <RiderOrderRequest
+              key={orderId}
+              orderId={orderId}
+              onAccepted={() => {
+                fetchProfile();
+                fetchCurrentOrder();
+              }}
+            />
           ))}
         </div>
       )}

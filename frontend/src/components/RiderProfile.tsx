@@ -1,10 +1,10 @@
-import type { IRider } from "../types";
-
+import type { IOrder, IRider } from "../types";
 
 interface RiderProfileProps {
   riderProfile: IRider;
   userName: string;
   toggle: boolean;
+  currentOrder: IOrder | null;
   onToggle: () => void;
 }
 
@@ -13,6 +13,7 @@ const RiderProfile = ({
   userName,
   toggle,
   onToggle,
+  currentOrder,
 }: RiderProfileProps) => {
   return (
     <div className="space-y-4 bg-gray-50 py-6">
@@ -48,7 +49,7 @@ const RiderProfile = ({
               hotspot) before going online as rider to receive orders
             </p>
           </div>
-          {riderProfile.isVerified && (
+          {riderProfile.isVerified && currentOrder && (
             <button
               className={`w-full rounded-lg py-2 text-sm ${toggle ? "bg-gray-500 hover:bg-gray-500" : !riderProfile.isAvailable ? "bg-green-600 hover:bg-green-700" : "bg-[#e23744] hover:bg-[#d12f3a]"} text-white`}
               onClick={onToggle}
