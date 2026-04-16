@@ -9,6 +9,7 @@ import AddRider from "../components/AddRider";
 import type { IOrder, IRider } from "../types";
 import audio from "../assets/faah_notification.mp3";
 import RiderOrderRequest from "../components/RiderOrderRequest";
+import RiderCurrentOrder from "../components/RiderCurrentOrder";
 
 // interface RiderProfileProps {
 //   riderProfile: IRider;
@@ -265,7 +266,7 @@ const RiderDashboard = () => {
   }
 
   return (
-    <div className=" min-h-screen space-y-4 w-full mx-auto px-4 py-6">
+    <div className=" min-h-screen space-y-4 max-w-3xl mx-auto px-4 py-6">
       <RiderProfile
         riderProfile={riderProfile}
         userName={user?.name || "Rider Name: Not Available"}
@@ -314,6 +315,12 @@ const RiderDashboard = () => {
             />
           ))}
         </div>
+      )}
+      {currentOrder && (
+        <RiderCurrentOrder
+          order={currentOrder}
+          onStatusUpdate={fetchCurrentOrder}
+        />
       )}
     </div>
   );
