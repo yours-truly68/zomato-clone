@@ -1,6 +1,10 @@
 import jwt from "jsonwebtoken";
 const isAuth = async (req, res, next) => {
     try {
+        const internalKey = req.headers["x-internal-key"];
+        if (internalKey && internalKey === process.env.INTERNAL_SERVICE_KEY) {
+            return next(); // 🔥 bypass JWT completely
+        }
         //check header for login token
         const authHeader = req.headers?.authorization;
         if (!authHeader || !authHeader.startsWith("Bearer ")) {
