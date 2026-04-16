@@ -49,7 +49,7 @@ const RiderProfile = ({
               hotspot) before going online as rider to receive orders
             </p>
           </div>
-          {riderProfile.isVerified && currentOrder && (
+          {riderProfile.isVerified && !currentOrder && (
             <button
               className={`w-full rounded-lg py-2 text-sm ${toggle ? "bg-gray-500 hover:bg-gray-500" : !riderProfile.isAvailable ? "bg-green-600 hover:bg-green-700" : "bg-[#e23744] hover:bg-[#d12f3a]"} text-white`}
               onClick={onToggle}

@@ -89,7 +89,7 @@ const OrderCard = ({ order, onStatusUpdate }: OrderCardProps) => {
         <span
           className={`px-3 py-1 rounded-full text-xs font-medium ${statusColor(order.status)}`}
         >
-          {order.status.replace("_", " ")}
+          {order.status.replaceAll("_", " ")}
         </span>
       </div>
       <div className="text-sm text-gray-600">
@@ -118,7 +118,7 @@ const OrderCard = ({ order, onStatusUpdate }: OrderCardProps) => {
               onClick={() => updateStatus(status)}
               disabled={loading}
             >
-              Mark as {status.replace("_", " ")}
+              Mark as {status.replaceAll("_", " ")}
             </button>
           ))}
         </div>

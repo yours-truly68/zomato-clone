@@ -10,9 +10,9 @@ const ACITVE_STATUSES = [
   "placed",
   "accepted",
   "preparing",
-  "ready-for-pickup",
-  "rider-assigned",
-  "out-for-delivery",
+  "ready_for_pickup",
+  "rider_assigned",
+  "out_for_delivery",
 ];
 
 const Orders = () => {
@@ -94,7 +94,7 @@ const Orders = () => {
 
       fetchOrders();
     };
-
+    
     socket.on("order:rider_assigned", onUpdateOrder);
 
     return () => {
