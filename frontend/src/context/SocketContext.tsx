@@ -56,6 +56,14 @@ export const SocketProvider = ({ children }: { children: ReactNode }) => {
       console.error("WebSocket connection error: ", err.message);
     });
 
+    socket.on("connect", () => {
+      console.log("✅ Connected:", socket.id);
+    });
+
+    socket.on("connect_error", (err) => {
+      console.error("❌ Socket error:", err.message);
+    });
+
     return () => {
       socket.disconnect();
       socketRef.current = null;

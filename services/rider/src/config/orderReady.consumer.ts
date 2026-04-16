@@ -54,14 +54,14 @@ export const startOrderReadyConsumer = async () => {
 
       for (const rider of nearbyRiders) {
         console.log(
-          `📲 Notifying rider ${rider._id} about order ${orderId}...`,
+          `📲 Notifying rider ${rider.userId} about order ${orderId}...`,
         );
         try {
           await axios.post(
             `${process.env.REALTIME_URL}/api/v1/internal/emit`,
             {
               event: "order:available",
-              room: `user:${rider._id}`,
+              room: `user:${rider.userId}`,
               payload: {
                 orderId,
                 restaurantId,
@@ -75,11 +75,11 @@ export const startOrderReadyConsumer = async () => {
           );
 
           console.log(
-            `✅ Notification sent to rider ${rider._id} for order ${orderId}`,
+            `✅ Notification sent to rider ${rider.userId} for order ${orderId}`,
           );
         } catch (error) {
           console.error(
-            `❌ Failed to notify rider ${rider._id} for order ${orderId}:`,
+            `❌ Failed to notify rider ${rider.userId} for order ${orderId}:`,
             error,
           );
         }
@@ -93,7 +93,7 @@ export const startOrderReadyConsumer = async () => {
         //         `${process.env.REALTIME_URL}/api/v1/internal/emit`,
         //         {
         //           event: "order:available",
-        //           room: `user:${rider._id}`,
+        //           room: `user:${rider.userId}`,
         //           payload: {
         //             orderId,
         //             restaurantId,
@@ -131,7 +131,7 @@ export const startOrderReadyConsumer = async () => {
         //         `${process.env.REALTIME_URL}/api/v1/internal/emit`,
         //         {
         //           event: "order:available",
-        //           room: `user:${rider._id}`,
+        //           room: `user:${rider.userId}`,
         //           payload: {
         //             orderId,
         //             restaurantId,
