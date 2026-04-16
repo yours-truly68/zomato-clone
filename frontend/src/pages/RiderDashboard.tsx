@@ -10,6 +10,7 @@ import type { IOrder, IRider } from "../types";
 import audio from "../assets/faah_notification.mp3";
 import RiderOrderRequest from "../components/RiderOrderRequest";
 import RiderCurrentOrder from "../components/RiderCurrentOrder";
+import RiderOrderMap from "../components/RiderOrderMap";
 
 // interface RiderProfileProps {
 //   riderProfile: IRider;
@@ -317,10 +318,13 @@ const RiderDashboard = () => {
         </div>
       )}
       {currentOrder && (
-        <RiderCurrentOrder
-          order={currentOrder}
-          onStatusUpdate={fetchCurrentOrder}
-        />
+        <div className="space-y-4 p-4">
+          <RiderCurrentOrder
+            order={currentOrder}
+            onStatusUpdate={fetchCurrentOrder}
+          />
+          <RiderOrderMap order={currentOrder} />
+        </div>
       )}
     </div>
   );
