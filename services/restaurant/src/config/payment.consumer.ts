@@ -23,8 +23,8 @@ export const startPaymentConsumer = async () => {
       const order = await Order.findOneAndUpdate(
         {
           _id: orderId,
-          paymentStatus: { $ne: "paid" },//double check to avoid processing already paid orders
-          //also Idempotency check in case of message re-deliverty 
+          paymentStatus: { $ne: "paid" }, //double check to avoid processing already paid orders
+          //also Idempotency check in case of message re-deliverty
         },
         {
           $set: {
@@ -54,9 +54,7 @@ export const startPaymentConsumer = async () => {
         {
           event: "order:new",
           room: `restaurant:${order.restaurantId}`,
-          payload: {
-            orderId: order._id,
-          },
+          payload: order,
         },
         {
           headers: {

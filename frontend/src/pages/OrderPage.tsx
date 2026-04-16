@@ -1,18 +1,22 @@
 import { useParams } from "react-router-dom";
 import { useSocket } from "../context/SocketContext";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import type { IOrder } from "../types";
 import axios from "axios";
 import { restaurantService } from "../main";
 import { BiLoader } from "react-icons/bi";
+import UserOrderMap from "../components/UserOrderMap";
 
 const OrderPage = () => {
   const { id } = useParams();
   const { socket } = useSocket();
   const [order, setOrder] = useState<IOrder | null>(null);
   const [loading, setLoading] = useState(false);
+  const [riderLocation, setRiderLocation] = useState<[number, number] | null>(
+    null,
+  );
 
-  const fetchOrder = async () => {
+  const fetchOrder = useCallback(async () => {
     try {
       setLoading(true);
       const token = localStorage.getItem("token");
@@ -35,29 +39,30 @@ const OrderPage = () => {
     } finally {
       setLoading(false);
     }
-  };
-
-  useEffect(() => {
-    fetchOrder();
   }, [id]);
 
   useEffect(() => {
+    fetchOrder();
+  }, [id, fetchOrder]);
+
+  // Listen for real-time updates to the order
+  useEffect(() => {
     if (!socket) return;
 
-    socket.onAny((event, ...args) => {
-      console.log("SOCKET EVENT RECEIVED:", event, args);
-      if (event === "orderUpdated" && args[0]._id === id) {
-        setOrder(args[0]);
+    const handleOrderUpdate = (updatedOrder: IOrder) => {
+      if (updatedOrder._id === id) {
+        setOrder(updatedOrder);
       }
-    });
+    };
+
+    socket.on("order:update", handleOrderUpdate);
 
     return () => {
-      if (socket) {
-        socket.offAny();
-      }
+      socket.off("order:update", handleOrderUpdate);
     };
   }, [socket, id]);
 
+  // Listen specifically for general order updates (status changes, etc.)
   useEffect(() => {
     if (!socket) return;
 
@@ -66,11 +71,52 @@ const OrderPage = () => {
     };
 
     socket.on("order:update", onOrderUpdate);
-    socket.on("order:rider_assigned", onOrderUpdate);
 
     return () => {
       socket.off("order:update", onOrderUpdate);
+    };
+  }, [socket, fetchOrder]);
+
+  // Listen specifically for rider assignment updates
+  useEffect(() => {
+    if (!socket) return;
+
+    const onOrderUpdate = () => {
+      fetchOrder();
+    };
+
+    socket.on("order:rider_assigned", onOrderUpdate);
+
+    return () => {
       socket.off("order:rider_assigned", onOrderUpdate);
+    };
+  }, [socket, fetchOrder]);
+
+  // Join the user-specific room to receive rider location updates
+  useEffect(() => {
+    if (!socket || !id) return;
+
+    socket.emit("join", `user:${id}`);
+
+    return () => {
+      if (socket) {
+        socket.emit("leave", `user:${id}`);
+      }
+    };
+  }, [socket, id]);
+
+  useEffect(() => {
+    if (!socket) return;
+    const onRiderLocationUpdate = ({ latitude, longitude }: any) => {
+      console.log("Received rider location update:", latitude, longitude);
+      setRiderLocation([latitude, longitude]);
+    };
+    socket.on("rider:location", onRiderLocationUpdate);
+
+    return () => {
+      if (socket) {
+        socket.off("rider:location", onRiderLocationUpdate);
+      }
     };
   }, [socket]);
 
@@ -160,6 +206,22 @@ const OrderPage = () => {
           <span>₹{order.grandTotal.toFixed(2)}</span>
         </div>
       </div>
+
+      {(order.status === "rider_assigned" ||
+        order.status === "out_for_delivery") &&
+      riderLocation ? (
+        <UserOrderMap
+          riderLocation={riderLocation}
+          deliveryLocation={[
+            order.deliveryAddress.latitude!,
+            order.deliveryAddress.longitude!,
+          ]}
+        />
+      ) : (
+        <p className="text-gray-500 text-lg">
+          Rider location not available. Waiting for rider location...
+        </p>
+      )}
     </div>
   );
 };

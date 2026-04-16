@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import type { IOrder } from "../types";
 import { useSocket } from "../context/SocketContext";
 import faahAudio from "../assets/faah_notification.mp3";
@@ -44,7 +44,7 @@ const RestaurantOrders = ({ restaurantId }: { restaurantId: string }) => {
     }
   };
 
-  const fetchOrders = async () => {
+  const fetchOrders = useCallback(async () => {
     try {
       const token = localStorage.getItem("token");
       if (!token) {
@@ -65,41 +65,38 @@ const RestaurantOrders = ({ restaurantId }: { restaurantId: string }) => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [restaurantId]);
 
   useEffect(() => {
     fetchOrders();
-  }, [restaurantId]);
+  }, [restaurantId, fetchOrders]);
 
   useEffect(() => {
     if (!socket) return;
 
-    const onUpdateOrder = () => {
-      console.log("🔥 New order received");
+    const onNewOrder = (newOrder: IOrder) => {
+      if (!audioUnlocked) return;
 
       if (audioRef.current) {
-        console.log("🔊 Trying to play audio...");
-
         audioRef.current.currentTime = 0;
-
-        audioRef.current
-          .play()
-          .then(() => {
-            console.log("✅ Audio played successfully");
-          })
-          .catch((err) => {
-            console.error("❌ Audio failed:", err);
-          });
+        audioRef.current.play().catch(console.error);
       }
 
-      fetchOrders();
+      setOrders((prev) => {
+        const exists = prev.find((o) => o._id === newOrder._id);
+        if (exists) {
+          return prev.map((o) => (o._id === newOrder._id ? newOrder : o));
+        }
+        return [newOrder, ...prev];
+      });
     };
-    socket.on("order:rider_assigned", onUpdateOrder);
+
+    socket.on("order:new", onNewOrder);
 
     return () => {
-      socket.off("order:rider_assigned", onUpdateOrder);
+      socket.off("order:new", onNewOrder);
     };
-  }, [socket]);
+  }, [socket, audioUnlocked]);
 
   if (loading) {
     return (

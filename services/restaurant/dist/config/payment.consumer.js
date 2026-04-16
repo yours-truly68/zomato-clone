@@ -20,7 +20,7 @@ export const startPaymentConsumer = async () => {
             const order = await Order.findOneAndUpdate({
                 _id: orderId,
                 paymentStatus: { $ne: "paid" }, //double check to avoid processing already paid orders
-                //also Idempotency check in case of message re-deliverty 
+                //also Idempotency check in case of message re-deliverty
             }, {
                 $set: {
                     paymentStatus: "paid",
@@ -42,9 +42,7 @@ export const startPaymentConsumer = async () => {
             await axios.post(`${process.env.REALTIME_URL}/api/v1/internal/emit`, {
                 event: "order:new",
                 room: `restaurant:${order.restaurantId}`,
-                payload: {
-                    orderId: order._id,
-                },
+                payload: order,
             }, {
                 headers: {
                     "x-internal-key": process.env.INTERNAL_SERVICE_KEY,
