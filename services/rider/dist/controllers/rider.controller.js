@@ -183,6 +183,7 @@ export const acceptOrderByRider = TryCatch(async (req, res) => {
             orderId,
             riderId: rider._id,
             riderUserId: rider.userId,
+            riderName: req.user?.name,
             riderPhone: rider.phone,
             picture: rider.picture,
         }, {

@@ -8,7 +8,7 @@ router.post("/new", isAuth, createOrder);
 router.get("/payment/:id", fetchOrderForPayment);
 router.get("/:restaurantId", isAuth, isSeller, fetchRestaurantOrders);
 router.put("/:orderId", isAuth, updateOrderStatus);
-router.put("/assign/rider", isAuth, assignOrderToRider);
+router.put("/assign/rider", assignOrderToRider);
 router.get("/rider/current/:riderId", getCurrentOrdersForRider);
 router.put("/update/rider/status", isAuth, updateOrderStatusByRider);
 export default router;
