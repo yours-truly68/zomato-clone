@@ -8,6 +8,6 @@ router.get("/profile", isAuth, getRiderProfile);
 router.patch("/toggle-availability", isAuth, toggleRiderAvailability);
 router.post("/new", isAuth, upload, addRiderProfile);
 router.post("/accept/:orderId", isAuth, acceptOrderByRider);
-router.get("/current/order", isAuth, fetchMyCurrentOrder);
+router.get("/order/current", isAuth, fetchMyCurrentOrder);
 router.patch("/rider/:orderId/status", isAuth, updateOrderStatus);
 export default router;

@@ -221,8 +221,7 @@ export const fetchMyCurrentOrder = TryCatch(async (req, res) => {
     }
     const rider = await Rider.findOne({
         userId: riderUserId,
-        isVerified: true,
-        isAvailable: false, // Only fetch current order if rider is currently unavailable (i.e., has an active order)
+        isVerified: true, // Only fetch current order if rider is currently unavailable (i.e., has an active order)
     });
     if (!rider) {
         return res
