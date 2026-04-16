@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useAppData } from "../context/AppContext";
 import { useSocket } from "../context/SocketContext";
 import axios from "axios";
@@ -6,7 +6,8 @@ import { riderService } from "../main";
 import { toast } from "react-hot-toast";
 import RiderProfile from "../components/RiderProfile";
 import AddRider from "../components/AddRider";
-import type { IRider } from "../types";
+import type { IOrder, IRider } from "../types";
+import audio from "../assets/faah_notification.mp3";
 
 // interface RiderProfileProps {
 //   riderProfile: IRider;
@@ -26,6 +27,56 @@ const RiderDashboard = () => {
   const [drivingLicenseNumber, setDrivingLicenseNumber] = useState<string>("");
   const [image, setImage] = useState<File | null>(null);
   const [submitting, setSubmitting] = useState(false);
+  const [incomingOrders, setIncomingOrders] = useState<string[]>([]); // For real-time incoming order notifications
+  const [currentOrder, setCurrentOrder] = useState<IOrder | null>(null); // To track the order currently being delivered
+  const [audioUnlocked, setAudioUnlocked] = useState(false);
+  const audioRef = useRef<HTMLAudioElement | null>(null); // For real-time incoming order notifications
+
+  useEffect(() => {
+    audioRef.current = new Audio(audio);
+    audioRef.current.preload = "auto";
+  }, []);
+
+  const unlockAudio = async () => {
+    if (!audioRef.current) return;
+
+    try {
+      await audioRef.current.play();
+      audioRef.current.pause();
+      audioRef.current.currentTime = 0;
+      setAudioUnlocked(true);
+      toast.success("Audio unlocked! You'll now receive order notifications.");
+    } catch (error) {
+      toast.error("Unable to unlock audio.");
+      console.error("Error unlocking audio:", error);
+    }
+  };
+
+  useEffect(() => {
+    if (!socket) return;
+
+    const onOrderAvailable = ({ orderId }: { orderId: string }) => {
+      setIncomingOrders((prev) =>
+        prev.includes(orderId) ? prev : [...prev, orderId],
+      );
+      if (audioUnlocked && audioRef.current) {
+        audioRef.current.currentTime = 0;
+        audioRef.current.play().catch((err) => {
+          console.error("Error playing notification sound:", err);
+        });
+      }
+
+      setTimeout(() => {
+        setIncomingOrders((prev) => prev.filter((id) => id !== orderId));
+      }, 10000); // Clear notification after 10 seconds
+    };
+
+    socket.on("order:available", onOrderAvailable);
+
+    return () => {
+      socket.off("order:available", onOrderAvailable);
+    };
+  }, [socket, audioUnlocked]);
 
   const handleSubmit = async () => {
     if (!navigator.geolocation) {
@@ -104,20 +155,36 @@ const RiderDashboard = () => {
     }
   }, [user]);
 
-  // Listen for real-time updates to rider profile (e.g., order status changes)
+  const fetchCurrentOrder = async () => {
+    try {
+      const token = localStorage.getItem("token");
+      if (!token) {
+        console.error("No auth token found. Please log in.");
+        return;
+      }
+
+      const { data } = await axios.get(
+        `${riderService}/api/rider/order/current`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        },
+      );
+
+      setCurrentOrder(data.order);
+    } catch (error) {
+      console.error("Error fetching current order:", error);
+      setCurrentOrder(null);
+    }
+  };
+
   useEffect(() => {
-    if (!socket) return;
+    if (riderProfile) {
+      fetchCurrentOrder();
+    }
+  }, [riderProfile]);
 
-    const handleProfileUpdate = (updatedRider: IRider) => {
-      setRiderProfile(updatedRider);
-    };
-
-    socket.on("orderStatusUpdated", handleProfileUpdate);
-
-    return () => {
-      socket.off("orderStatusUpdated", handleProfileUpdate);
-    };
-  }, [socket]);
   const toggleAvailability = async () => {
     if (!navigator.geolocation) return;
 
@@ -199,12 +266,38 @@ const RiderDashboard = () => {
   }
 
   return (
-    <RiderProfile
-      riderProfile={riderProfile}
-      userName={user?.name || "Rider Name: Not Available"}
-      toggle={toggle}
-      onToggle={toggleAvailability}
-    />
+    <div className=" min-h-screen space-y-4 max-w-3xl mx-auto px-4 py-6">
+      <RiderProfile
+        riderProfile={riderProfile}
+        userName={user?.name || "Rider Name: Not Available"}
+        toggle={toggle}
+        onToggle={toggleAvailability}
+      />
+      {!audioUnlocked && (
+        <div className="flex justify-between items-center bg-blue-50 border border-blue-200 p-4 rounded-lg ">
+          <div className="flex items-center gap-3">
+            <span className="text-2xl">🔊</span>
+            <div>
+              <p
+                className="text-blue-600 font-medium  cursor-pointer"
+                onClick={unlockAudio}
+              >
+                Enable Sound Notification{" "}
+              </p>
+              <p className="text-sm text-gray-400">
+                Get notified whenever a new order is placed!
+              </p>
+            </div>
+          </div>
+          <button
+            className="rounded-lg bg-blue-600 hover:bg-blue-700 text-white py-2 px-4 transition text-sm"
+            onClick={unlockAudio}
+          >
+            Enable Audio
+          </button>
+        </div>
+      )}
+    </div>
   );
 };
 

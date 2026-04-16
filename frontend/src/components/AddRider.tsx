@@ -1,4 +1,5 @@
 import { BiUpload } from "react-icons/bi";
+import { useNavigate } from "react-router-dom";
 
 interface AddRiderProps {
   adharNumber: string;
@@ -27,6 +28,8 @@ const AddRider = ({
   handleSubmit,
   submitting,
 }: AddRiderProps) => {
+  const navigate = useNavigate();
+  navigate("/rider/dashboard");
   return (
     <div className="flex items-center justify-center min-h-screen bg-gray-50 px-4 py-6">
       <div className="mx-auto max-w-lg rounded-xl bg-white p-6 shadow-sm space-y-5">
