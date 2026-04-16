@@ -19,7 +19,7 @@ import RiderDashboard from "./pages/RiderDashboard";
 import Admin from "./pages/Admin";
 
 const App = () => {
-  const { loading } = useAppData();
+  const { user, loading } = useAppData();
 
   if (loading) {
     return (
@@ -29,6 +29,20 @@ const App = () => {
     );
   }
 
+  if (!user) {
+    return (
+      <BrowserRouter>
+        <Routes>
+          <Route element={<PublicRoute />}>
+            <Route path="/login" element={<Login />} />
+          </Route>
+        </Routes>
+      </BrowserRouter>
+    );
+  }
+  if (user.role === "admin") {
+    return <Admin />;
+  }
   return (
     <BrowserRouter>
       <Navbar />
@@ -55,7 +69,6 @@ const App = () => {
           {/* 🔥 ROLE BASED ROUTES */}
           <Route path="/rider/dashboard" element={<RiderDashboard />} />
           <Route path="/seller" element={<Restaurant />} />
-          <Route path="/admin" element={<Admin />} />
         </Route>
       </Routes>
     </BrowserRouter>

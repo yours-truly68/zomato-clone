@@ -4,14 +4,13 @@ import {
   getRestaurantCollection,
 } from "../utils/collection.js";
 import TryCatch from "../middleware/trycatch.middleware.js";
-import { get } from "mongoose";
 
 export const getPendingRestaurants = TryCatch(async (req, res) => {
   const restaurants = await (
     await getRestaurantCollection()
   )
     .find({
-      isVerified: false,
+      $or: [{ isVerified: false }, { isVerified: { $exists: false } }],
     })
     .toArray();
 
@@ -26,7 +25,7 @@ export const getPendingRiders = TryCatch(async (req, res) => {
     await getRiderCollection()
   )
     .find({
-      isVerified: false,
+      $or: [{ isVerified: false }, { isVerified: { $exists: false } }],
     })
     .toArray();
 
@@ -52,9 +51,12 @@ export const verifyRestaurant = TryCatch(async (req, res) => {
 
   const result = await (
     await getRestaurantCollection()
-  ).updateOne(new ObjectId(id), {
-    $set: { isVerified: true, updatedAt: new Date() },
-  });
+  ).updateOne(
+    { _id: new ObjectId(id) },
+    {
+      $set: { isVerified: true, updatedAt: new Date() },
+    },
+  );
 
   if (result.matchedCount === 0) {
     return res.status(404).json({
@@ -84,9 +86,12 @@ export const verifyRider = TryCatch(async (req, res) => {
 
   const result = await (
     await getRiderCollection()
-  ).updateOne(new ObjectId(id), {
-    $set: { isVerified: true, updatedAt: new Date() },
-  });
+  ).updateOne(
+    { _id: new ObjectId(id) },
+    {
+      $set: { isVerified: true, updatedAt: new Date() },
+    },
+  );
 
   if (result.matchedCount === 0) {
     return res.status(404).json({

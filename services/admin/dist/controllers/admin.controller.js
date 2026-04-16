@@ -4,7 +4,7 @@ import TryCatch from "../middleware/trycatch.middleware.js";
 export const getPendingRestaurants = TryCatch(async (req, res) => {
     const restaurants = await (await getRestaurantCollection())
         .find({
-        isVerified: false,
+        $or: [{ isVerified: false }, { isVerified: { $exists: false } }],
     })
         .toArray();
     res.json({
@@ -15,7 +15,7 @@ export const getPendingRestaurants = TryCatch(async (req, res) => {
 export const getPendingRiders = TryCatch(async (req, res) => {
     const riders = await (await getRiderCollection())
         .find({
-        isVerified: false,
+        $or: [{ isVerified: false }, { isVerified: { $exists: false } }],
     })
         .toArray();
     res.json({
@@ -34,7 +34,7 @@ export const verifyRestaurant = TryCatch(async (req, res) => {
             message: "Invalid restaurant ID format",
         });
     }
-    const result = await (await getRestaurantCollection()).updateOne(new ObjectId(id), {
+    const result = await (await getRestaurantCollection()).updateOne({ _id: new ObjectId(id) }, {
         $set: { isVerified: true, updatedAt: new Date() },
     });
     if (result.matchedCount === 0) {
@@ -58,7 +58,7 @@ export const verifyRider = TryCatch(async (req, res) => {
             message: "Invalid rider ID format",
         });
     }
-    const result = await (await getRiderCollection()).updateOne(new ObjectId(id), {
+    const result = await (await getRiderCollection()).updateOne({ _id: new ObjectId(id) }, {
         $set: { isVerified: true, updatedAt: new Date() },
     });
     if (result.matchedCount === 0) {
