@@ -12,6 +12,7 @@ const PublicRoute = () => {
   }
 
   // 🔴 If authenticated but user not loaded yet → wait
+
   if (!user) {
     return null;
   }
