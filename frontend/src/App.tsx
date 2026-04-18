@@ -16,7 +16,7 @@ import Orders from "./pages/Orders";
 import OrderPage from "./pages/OrderPage";
 import RiderDashboard from "./pages/RiderDashboard";
 import Admin from "./pages/Admin";
-import PublicRoute from "./components/publicRoute";
+import PublicRoute from "./components/PublicRoute";
 
 const App = () => {
   const { user, loading } = useAppData();

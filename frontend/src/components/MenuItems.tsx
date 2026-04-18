@@ -8,6 +8,7 @@ import toast from "react-hot-toast";
 import { useAppData } from "../context/AppContext";
 import type { IMenuItem } from "../types";
 import { FaCircle } from "react-icons/fa6";
+import { BsCartPlus, BsEye } from "react-icons/bs";
 interface MenuItemsProps {
   isSeller: boolean;
   menuItems: IMenuItem[];
