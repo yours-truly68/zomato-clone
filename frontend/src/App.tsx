@@ -2,7 +2,6 @@ import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { Home } from "./pages/Home";
 import { Login } from "./pages/Login";
 import ProtectedRoute from "./components/ProtectedRoute";
-import PublicRoute from "./components/publicRoute";
 import { SelectRole } from "./pages/SelectRole";
 import Navbar from "./components/Navbar";
 import Account from "./pages/Account";
@@ -17,6 +16,7 @@ import Orders from "./pages/Orders";
 import OrderPage from "./pages/OrderPage";
 import RiderDashboard from "./pages/RiderDashboard";
 import Admin from "./pages/Admin";
+import PublicRoute from "./components/publicRoute";
 
 const App = () => {
   const { user, loading } = useAppData();

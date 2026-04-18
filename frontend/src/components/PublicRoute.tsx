@@ -28,4 +28,5 @@ const PublicRoute = () => {
 
   return <Navigate to="/" replace />;
 };
+
 export default PublicRoute;

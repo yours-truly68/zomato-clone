@@ -11,7 +11,6 @@ import audio from "../assets/faah_notification.mp3";
 import RiderOrderRequest from "../components/RiderOrderRequest";
 import RiderCurrentOrder from "../components/RiderCurrentOrder";
 import RiderOrderMap from "../components/RiderOrderMap";
-import { useNavigate } from "react-router-dom";
 
 // interface RiderProfileProps {
 //   riderProfile: IRider;
