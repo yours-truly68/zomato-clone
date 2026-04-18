@@ -7,12 +7,12 @@ import { AppProvider } from "./context/AppContext.tsx";
 import "leaflet/dist/leaflet.css";
 import { SocketProvider } from "./context/SocketContext.tsx";
 
-export const authService = "http://localhost:8000";
-export const restaurantService = "http://localhost:8001";
-export const utilServices = "http://localhost:8002";
-export const realtimeService = "http://localhost:8004";
-export const riderService = "http://localhost:8005";
-export const adminService = "http://localhost:8006";
+export const authService = "https://zomatoes-auth.onrender.com";
+export const restaurantService = "https://restaurant-service-gcgo.onrender.com";
+export const utilServices = "https://utils-service-e6ww.onrender.com";
+export const realtimeService = "https://realtime-service-832s.onrender.com";
+export const riderService = "https://rider-service-7ci8.onrender.com";
+export const adminService = "https://zomatoes-admin-1.onrender.com";
 
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
