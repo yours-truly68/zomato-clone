@@ -1,5 +1,4 @@
 import { useState } from "react";
-import { BsBookmarkFill, BsCartPlus, BsEye } from "react-icons/bs";
 import { FiEyeOff } from "react-icons/fi";
 import { BiTrash } from "react-icons/bi";
 import { VscLoading } from "react-icons/vsc";

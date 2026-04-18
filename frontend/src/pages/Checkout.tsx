@@ -14,7 +14,7 @@ interface Address {
 }
 
 const Checkout = () => {
-  const { cart, subTotal, quantity, fetchCart } = useAppData();
+  const { cart, subTotal, quantity } = useAppData();
   const [address, setAddress] = useState<Address[]>([]);
   const [selectAddressId, setSelectAddressId] = useState<string | null>(null);
   const [loadingAddress, setLoadingAddress] = useState(true);
