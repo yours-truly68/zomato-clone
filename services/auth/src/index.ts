@@ -15,15 +15,8 @@ app.use(
   }),
 );
 
-app.use((req, res, next) => {
-  res.header("Access-Control-Allow-Credentials", "true");
-  next();
-});
-
 app.use(express.json());
 app.use("/api/auth", authRoute);
-
-app.options("*", cors());
 
 const PORT = process.env.PORT || 8000;
 app.listen(PORT, () => {
