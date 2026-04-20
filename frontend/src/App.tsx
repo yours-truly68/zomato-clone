@@ -46,6 +46,7 @@ const App = () => {
   }
   return (
     <BrowserRouter>
+    {user.role === "customer" && <Navbar />} {/* Show Navbar only for customers */}
 
       <Routes>
         {/* Public */}
